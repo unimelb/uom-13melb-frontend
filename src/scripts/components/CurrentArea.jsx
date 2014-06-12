@@ -23,16 +23,13 @@ var CurrentArea = React.createClass({
 		});
 	},
 	render: function () {
-		var path_html = this.state.path.map(function (path) {
-			return (
-				<span>
-					&nbsp;&gt;&nbsp;{path.name}
-				</span>
-			);
-		})
+		var pathstr = this.state.path.map(function (path) {
+			return path.name;
+		}).join(" > ");
+
 		return (
 			<h2 className="current_area">
-				{path_html}
+				{pathstr}
 			</h2>
 		);
 	}

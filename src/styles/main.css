@@ -1,2 +1,73 @@
 /* Stiziles */
 
+a {
+	text-decoration:none;
+}
+
+h2 {
+	font-size:16pt;
+	font-weight:bold;
+	line-height:1.5;
+	margin-bottom:10px;
+}
+h3 {
+	font-weight:bold;
+	line-height:2;
+}
+
+.highlighted {
+	background-color:#CCF;
+}
+
+.child_area, .succeeds {
+	padding-left:7px;
+	border-left:3px solid #CCC;
+}
+
+.main {
+	width:960px;
+	margin:50px auto;
+	font-family:helvetica, arial, sans-serif;
+	font-size:10pt;
+	line-height:20px;
+}
+
+form.search_form {
+	margin-bottom:20px;
+}
+
+input[type=text] {
+	font-size:16pt;
+	padding:10px;
+	box-sizing:border-box;
+	width:100%;
+}
+
+ul.area_list {
+	list-style-type:none;
+	margin-left:0px;
+	padding-left:0px;
+	font-size:12pt;
+}
+
+ul.area_list li {
+	margin-bottom:5px;
+}
+
+table, td {
+	border:1px solid #CCC;
+}
+
+td {
+	padding:3px;
+}
+
+.collection, .contact_table, .notes {
+	margin-bottom:5px;
+}
+
+ul {
+	list-style-type:disc;
+	margin-left:10px;
+	padding-left:10px;
+}

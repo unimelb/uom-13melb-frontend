@@ -7,14 +7,18 @@
 var React = require('react/addons');
 require('../../styles/Contacts.css');
 
+var AreaContacts = require("./AreaContacts.jsx");
+
 var url_base = "http://uom-13melb.herokuapp.com/area/";
+var cutoff = 10;
 
 var Contacts = React.createClass({
 	getInitialState: function () {
 		return {
 			path: [],
 			contacts: [],
-			descendents: {area: null, children: []}
+			descendents: {area: null, children: []},
+			descendent_contact_count: 0
 		};
 	},
 	componentWillReceiveProps: function (new_props) {
@@ -26,60 +30,74 @@ var Contacts = React.createClass({
 			}.bind(this)
 		});
 		$.ajax({
-			url: url_base + new_props.area + "/all_contacts",
-			dataType: "json",
-			success: function (data) {
-				this.setState({contacts: data});
-			}.bind(this),
-			error: function (xhr, status, err) {
-				console.error(status, err.toString());
-			}.bind(this)
-		});
-		$.ajax({
 			url: url_base + new_props.area + "/descendents",
 			dataType: "json",
 			success: function (data) {
 				this.setState({descendents: data});
 			}.bind(this)
 		});
+		$.ajax({
+			url: url_base + new_props.area + "/descendent_contact_count",
+			dataType: "json",
+			success: function (data) {
+				this.setState({descendent_contact_count: data.contacts});
+			}.bind(this)
+		})
+	},
+	selectArea : function (area) {
+		this.props.onAreaSelect(area);
 	},
 	render: function () {
-		var path_info = this.state.path.map(function (element) {
-			if (element.note) {
-				return [
-					<h3>{element.name}</h3>
-				,
-					<p>{element.note}</p>
-				];
-			} else {
-				return null;
-			}
+		var contact_display = this.state.path.map(function (element) {
+			return <AreaContacts area={element} />;
 		});
+
+		var subcontact_display = function (children) {
+			return children.map(function (child) {
+				var subcontacts = subcontact_display(child.children);
+				return (
+					<div className="child_area">
+						<AreaContacts area={child.area} />
+						{subcontacts}
+					</div>
+				);
+			});
+		};
+
+		var descendent_contacts = subcontact_display(this.state.descendents.children);
 
 		var explore = function (tree) {
 			var sub_list = tree.children.map(explore);
-			console.log("tree");
-			console.log(tree);
+			var load_area = function () {
+				this.selectArea(tree.area.area_id);
+				return false;
+			}.bind(this);
 			return (
 				<li>
-					> {tree.area.name}
+					<a href="#" onClick={load_area}>{tree.area.name}</a>
 					<ul>
 						{sub_list}
 					</ul>
 				</li>
 			);
-		}
+		}.bind(this);
 
 		var descendents = this.state.descendents.children.map(explore);
-		
-		return (
-			<div>
-				{path_info}
-				{this.state.contacts}
-				Descendents:
-				{descendents}
-			</div>
-		);
+		if (this.state.descendent_contact_count > cutoff) {
+			return (
+				<div>
+					<h3>Descendents</h3>
+					<ul>{descendents}</ul>
+				</div>
+			);
+		} else {
+			return (
+				<div>
+					{contact_display}
+					{descendent_contacts}
+				</div>
+			);
+		}
 	}
 });
 
