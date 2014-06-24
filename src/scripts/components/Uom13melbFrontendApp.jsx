@@ -21,24 +21,29 @@ var search_url = function (area) {
 require('../../styles/reset.css');
 require('../../styles/main.css');
 
-var imageURL = '../../images/yeoman.png';
+var initialState = {
+	"areas" : [],
+	"selected_area" : 0,
+	"current_area" : "root",
+	"history" : ["root"],
+	"tokens" : [],
+	"isSearching" : false
+};
 
 var Uom13melbFrontendApp = React.createClass({
+	lastSearchString : "",
 	getInitialState : function () {
-		return {
-			"areas" : [],
-			"selected_area" : 0,
-			"current_area" : "root"
-		};
+		return initialState;
 	},
 	componentDidMount : function () {
 		document.addEventListener("keydown", this.handleKeyPress);
 	},
 	handleReset : function () {
-		this.setState({"current_area" : "root"});
+		this.replaceState(initialState);
 	},
 	handleSearch : function (search_text) {
 		this.setState({"selected_area" : 0});
+		this.lastSearchString = search_text;
 		if (search_text.length == 0) {
 			this.setState({areas : []});
 		} else {
@@ -53,8 +58,19 @@ var Uom13melbFrontendApp = React.createClass({
 			});
 		}
 	},
-	handleAreaSelect: function (area_id) {
-		this.setState({current_area : area_id, areas : []});
+	handleAreaSelect: function (area_id, token_removed) {
+		var stateToSet = {
+			current_area : area_id,
+			areas : [],
+			history : this.state.history.concat([area_id])
+		};
+		if (!token_removed) {
+			stateToSet["tokens"] = this.state.tokens.concat([{
+				search_string : this.lastSearchString,
+				prev_area : this.state.current_area
+			}]);
+		}
+		this.setState(stateToSet);
 	},
 	handleMoveResultCursor : function (key) {
 		var selected_area = this.state.selected_area;
@@ -66,6 +82,9 @@ var Uom13melbFrontendApp = React.createClass({
 	  		this.handleAreaSelect(this.state.areas[selected_area].slice(-1)[0].area_id);
 		}
 	},
+	handleGoBack : function () {
+		console.log("Go back");
+	},
 	handleKeyPress : function (key) {
 		var pressed = key.keyIdentifier;
 		if (pressed == "Up" || pressed == "Down" || pressed == "Enter") {
@@ -74,16 +93,46 @@ var Uom13melbFrontendApp = React.createClass({
 		} else if (pressed == "U+001B") {
 			this.handleReset();
 			key.preventDefault();
+		}/* else if (pressed == "U+0008") {
+			this.handleGoBack();
+			key.preventDefault();
+		}*/
+	},
+	handleIsSearching : function (isSearching) {
+		this.setState({"isSearching" : isSearching});
+	},
+	handleCloseToken : function (area) {
+		var tokens = this.state.tokens;
+		for (var i = 0; i < tokens.length; i++) {
+			if (tokens[i].prev_area == area) {
+				this.setState({"tokens" : tokens.slice(0, i)});
+				break;
+			}
 		}
+		console.log(this.state.tokens);
+		this.handleAreaSelect(area, true);
 	},
 	render: function() {
 		return (
 			<div className="main" onKeyUp={this.handleKeyPress}>
 				<h1>13MELB</h1>
-				<SearchBox onSearch={this.handleSearch} onMoveResultCursor={this.handleMoveResultCursor} onReset={this.handleReset} />
+				<SearchBox
+					onSearch={this.handleSearch}
+					onMoveResultCursor={this.handleMoveResultCursor}
+					onCloseToken={this.handleCloseToken}
+					onReset={this.handleReset}
+					onIsSearching={this.handleIsSearching}
+					area={this.state.area_id}
+					tokens={this.state.tokens}
+				/>
 				<CurrentArea area={this.state.current_area} />
 				<AreaList data={this.state.areas} selected={this.state.selected_area} onClick={this.handleAreaSelect} />
-				<Contacts area={this.state.current_area} onAreaSelect={this.handleAreaSelect} />
+				<Contacts
+					showDescendents={true}
+					area={this.state.current_area}
+					onAreaSelect={this.handleAreaSelect}
+					isSearching={this.state.isSearching}
+				/>
 			</div>
 		);
 	}

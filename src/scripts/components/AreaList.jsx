@@ -26,17 +26,28 @@ var AreaList = React.createClass({
 	render: function () {
 		var dom_object = this;
 		var area_list = this.props.data.map(function (area, index) {
+			var area_id = area[area.length - 1]["area_id"];
+			console.log(area_id);
 			var area_path = area.map(function (path) {
 				return path.name;
 			}).join(" > ");
 
 			var click_handle = function () {
-				dom_object.handleClick(area[area.length - 1].area_id);
+				dom_object.handleClick(area_id);
 			}
 
 			var class_name = dom_object.state.selected == index ? "highlighted" : "unhighlighted";
+			var contacts = <Contacts showDescendents={false} area={area_id} />;
+			console.log(contacts);
 			return (
-				<li className={class_name}><a href="#" onClick={click_handle}>{area_path}</a></li>
+				<li key={area_id} className={class_name}>
+					<div className="area">
+						<a href="#" onClick={click_handle}>{area_path}</a>
+					</div>
+					<div className="contacts">
+						{contacts}
+					</div>
+				</li>
 			);
 		});
 

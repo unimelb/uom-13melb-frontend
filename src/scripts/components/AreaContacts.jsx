@@ -34,18 +34,43 @@ var AreaContacts = React.createClass({
 		;
 
 		var headings = [
-			"first_name", "last_name", "position", "phone", "email", "note"
+			"first_name", "last_name", "position", "phone", "email", "address", "location", "url", "note"
 		];
+		var num_contacts = 0;
 		var render_contact_table = function (contacts) {
+			var used_headings = [];
 			var rows = contacts.contacts.map(function (contact) {
-				var cells = headings.map(function (heading) {
-					if (heading in contact.contact_info) {
-						return <td>{contact.contact_info[heading]}</td>;
-					} else return <td></td>;
+				num_contacts++;
+				var cells = {};
+				headings.forEach(function (heading) {
+					if (heading == "url") {
+						if ("url" in contact) {
+							var note = contact.url.note ? " (" + contact.url.note + ")" : null;
+							cells["url"] = <td><a href={contact.url.url}>{contact.url.url}{note}</a></td>;
+							used_headings.push("url");
+						}
+					} else if (heading in contact.contact_info) {
+						used_headings.push(heading);
+						cells[heading] = <td>{contact.contact_info[heading]}</td>;
+					}
 				});
-				return <tr>{cells}</tr>;
+				return cells;
 			});
-			var table = <table className="contact_table">{rows}</table>;
+			var reduced_headings = headings.reduce(function (acc, heading) {
+				return used_headings.indexOf(heading) > -1 ? acc.concat([heading]) : acc;
+			}, []);
+			var head_row = <tr>{reduced_headings.map(function (heading) {
+				return <th>{heading}</th>
+			})}</tr>;
+			var data_rows = rows.map(function (row) {
+				return <tr>{reduced_headings.map(function (heading) {
+					return row[heading] || <td></td>;
+				})}</tr>;
+			})
+			var table = num_contacts
+				? <table className="contact_table">{head_row}{data_rows}</table>
+				: null
+			;
 			var successors = contacts.successors.map(function (successor) {
 				var successor_coll = render_contact_table(successor.collection);
 				return (
@@ -56,13 +81,15 @@ var AreaContacts = React.createClass({
 				);
 			});
 
+			if (this.props.counter) this.props.counter(num_contacts);
+
 			return (
 				<div>
 					{table}
 					{successors}
 				</div>
 			);
-		};
+		}.bind(this);
 
 		var contacts = this.state.contacts.length == 0
 			? null
