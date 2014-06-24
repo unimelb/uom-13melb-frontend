@@ -6,6 +6,11 @@
 
 var React = require('react/addons');
 require('../../styles/AreaContacts.css');
+var ZeroClipboard = require("zeroclipboard");
+
+ZeroClipboard.config({
+	swfPath: "//cdnjs.cloudflare.com/ajax/libs/zeroclipboard/2.1.1/ZeroClipboard.swf"
+});
 
 var url_base = "http://uom-13melb.herokuapp.com/area/";
 
@@ -26,6 +31,27 @@ var AreaContacts = React.createClass({
 	},
 	componentWillMount : function () {
 		this.componentWillReceiveProps(this.props);
+	},
+	componentDidMount : function () {
+		setTimeout(function () {
+			var ref = "contacts-" + this.props.area.area_id;
+			console.log("ref: " + ref);
+			var cells = document.getElementsByClassName("clickable");
+			var client = new ZeroClipboard(cells);
+			client.on("ready", function (event) {
+				client.on("copy", function (event) {
+					var clipboard = event.clipboardData;
+					clipboard.setData("text/plain", event.target.innerHTML);
+				});
+				client.on("aftercopy", function (event) {
+					var target = event.target;
+					target.style.backgroundColor = "#CFC";
+					setTimeout(function () {
+						target.style.backgroundColor = "transparent";
+					}, 200);
+				});
+			});
+		}.bind(this), 500);
 	},
 	render: function () {
 		var notes = this.props.area.note == null
@@ -51,11 +77,12 @@ var AreaContacts = React.createClass({
 						}
 					} else if (heading in contact.contact_info) {
 						used_headings.push(heading);
-						cells[heading] = <td>{contact.contact_info[heading]}</td>;
+						var class_name = heading == "phone" || heading == "email" ? "clickable" : "";
+						cells[heading] = <td className={class_name}>{contact.contact_info[heading]}</td>;
 					}
-				});
+				}.bind(this));
 				return cells;
-			});
+			}.bind(this));
 			var reduced_headings = headings.reduce(function (acc, heading) {
 				return used_headings.indexOf(heading) > -1 ? acc.concat([heading]) : acc;
 			}, []);
@@ -67,8 +94,10 @@ var AreaContacts = React.createClass({
 					return row[heading] || <td></td>;
 				})}</tr>;
 			})
+			var ref = "contacts-" + this.props.area.area_id;
+			console.log(ref);
 			var table = num_contacts
-				? <table className="contact_table">{head_row}{data_rows}</table>
+				? <table ref={ref} className="contact_table">{head_row}{data_rows}</table>
 				: null
 			;
 			var successors = contacts.successors.map(function (successor) {
