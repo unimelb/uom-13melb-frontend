@@ -5,6 +5,7 @@
 'use strict';
 
 var React = require('react/addons');
+var util  = require("util");
 require('../../styles/SearchBox.css');
 
 var autoCompleteTimeout;
@@ -44,13 +45,13 @@ var SearchBox = React.createClass({
 			var search_text = this.refs.search.getDOMNode().value;
 			clearTimeout(autoCompleteTimeout);
 			if (search_text.length > 2) {
-				this.props.onIsSearching(true);
+				//this.props.onIsSearching(true);
 				autoCompleteTimeout = setTimeout(function () {
 					this.props.onSearch(search_text);
 				}.bind(this), 200);
 			} else {
 				this.props.onSearch('');
-				this.props.onIsSearching(false);
+				//this.props.onIsSearching(false);
 			}
 
 			this.refs.search_shadow.getDOMNode().innerHTML = this.refs.search.getDOMNode().value;
@@ -72,10 +73,12 @@ var SearchBox = React.createClass({
 	},
     render : function () {
     	var tokens = this.props.tokens.map(function (token) {
+    		var label = token.search_string ? token.search_string : " ";
     		return <li onClick={function () { this.handleRemoveToken(token.prev_area); }.bind(this)}>
-    			{token.search_string}
+    			{label}
     		</li>;
     	}.bind(this));
+    	var progressbar_style = {"width" : this.props.progressBarWidth + "%"};
         return (
             <form className="search_form" onSubmit={this.handleSubmit}>
             	<div className="search_box" onClick={this.handleFauxBoxClick}>
@@ -84,6 +87,7 @@ var SearchBox = React.createClass({
             		</ul>
                 	<input type="text" ref="search" onKeyDown={this.handleKeyDown} onKeyUp={this.handleKeyUp} />
                 </div>
+                <div className="progressbar" style={progressbar_style}></div>
                 <div ref="search_shadow" className="search_shadow"></div>
             </form>
         );

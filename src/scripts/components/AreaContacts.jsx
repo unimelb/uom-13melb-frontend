@@ -15,7 +15,7 @@ ZeroClipboard.config({
 var url_base = "http://uom-13melb.herokuapp.com/area/";
 
 var AreaContacts = React.createClass({
-	getInitialState : function () {
+	/*getInitialState : function () {
 		return {"contacts" : []};
 	},
 	componentWillReceiveProps : function (new_props) {
@@ -31,7 +31,7 @@ var AreaContacts = React.createClass({
 	},
 	componentWillMount : function () {
 		this.componentWillReceiveProps(this.props);
-	},
+	},*/
 	componentDidMount : function () {
 		setTimeout(function () {
 			var ref = "contacts-" + this.props.area.area_id;
@@ -120,9 +120,11 @@ var AreaContacts = React.createClass({
 			);
 		}.bind(this);
 
-		var contacts = this.state.contacts.length == 0
+		console.log(this.props.area.area_id);
+		console.log(this.props.contacts);
+		var contacts = !this.props.contacts || this.props.contacts.length == 0
 			? null
-			: this.state.contacts.map(render_contact_table);
+			: this.props.contacts.map(render_contact_table);
 		;
 
 		if (notes || contacts) {
