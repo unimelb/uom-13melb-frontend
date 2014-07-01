@@ -12,33 +12,30 @@ var Contacts  = require("./Contacts.jsx");
 var url_base = "http://uom-13melb.herokuapp.com/area/";
 
 var AreaList = React.createClass({
-	getInitialState : function () {
-		return {
-			"selected" : 0
-		};
-	},
 	handleClick: function (area_id) {
 		this.props.onClick(area_id);
 	},
 	componentWillReceiveProps : function (new_props) {
-		this.state.selected = new_props.selected;
+		//this.state.selected = new_props.selected;
 	},
 	render: function () {
-		var dom_object = this;
-		var area_list = this.props.data.map(function (area, index) {
-			var area_id = area[area.length - 1]["area_id"];
-			console.log(area_id);
-			var area_path = area.map(function (path) {
+		var area_list = this.props.areas.map(function (path, index) {
+			var area_id = path[path.length - 1]["area_id"];
+			var area_path = path.map(function (path) {
 				return path.name;
 			}).join(" > ");
 
 			var click_handle = function () {
-				dom_object.handleClick(area_id);
-			}
+				this.handleClick(area_id);
+			}.bind(this);
 
-			var class_name = dom_object.state.selected == index ? "highlighted" : "unhighlighted";
-			var contacts = <Contacts showDescendents={false} area={area_id} />;
-			console.log(contacts);
+			var class_name = this.props.selected == index ? "highlighted" : "unhighlighted";
+			var contacts = <Contacts
+				showDescendents={false}
+				path={path}
+				area_info={{descendent_contact_count : path[path.length - 1].descendent_contact_count}}
+				contact_info={this.props.contacts} />
+			;
 			return (
 				<li key={area_id} className={class_name}>
 					<div className="area">
@@ -49,7 +46,7 @@ var AreaList = React.createClass({
 					</div>
 				</li>
 			);
-		});
+		}.bind(this));
 
 		return (
 		    <ul className="area_list">
