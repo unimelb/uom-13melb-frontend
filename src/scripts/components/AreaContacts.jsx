@@ -120,11 +120,13 @@ var AreaContacts = React.createClass({
 			);
 		}.bind(this);
 
-		console.log(this.props.area.area_id);
-		console.log(this.props.contacts);
-		var contacts = !this.props.contacts || this.props.contacts.length == 0
+		//console.log(this.props.area.area_id);
+		//console.log(this.props.contacts);
+		var contacts = !this.props.contacts
 			? null
-			: this.props.contacts.map(render_contact_table);
+			: this.props.contacts.length == 0
+				? null
+				: this.props.contacts.map(render_contact_table);
 		;
 
 		if (notes || contacts) {

@@ -36,6 +36,7 @@ var AreaList = React.createClass({
 				area_info={{descendent_contact_count : path[path.length - 1].descendent_contact_count}}
 				contact_info={this.props.contacts} />
 			;
+			
 			return (
 				<li key={area_id} className={class_name}>
 					<div className="area">

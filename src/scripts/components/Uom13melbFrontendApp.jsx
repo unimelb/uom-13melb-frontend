@@ -118,7 +118,11 @@ var Uom13melbFrontendApp = React.createClass({
 				success: function (data) {
 
 					// fetch contacts for all areas in results
-					new_state.search_results = data;
+					//new_state.search_results = data;
+					this.setState({
+						search_results : data,
+						search_contacts : false
+					});
 					var contacts_to_fetch = [];
 					data.forEach(function (path) {
 						path.forEach(function (area) {
@@ -175,6 +179,8 @@ var Uom13melbFrontendApp = React.createClass({
 				descendents : results[1],
 				descendent_contact_count : results[2].contacts
 			};
+			new_state.contacts = false;
+			this.setState(new_state);
 
 			// fetch contacts
 			var contacts_to_fetch = [];

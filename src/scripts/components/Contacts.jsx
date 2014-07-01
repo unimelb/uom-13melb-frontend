@@ -13,54 +13,6 @@ var url_base = "http://uom-13melb.herokuapp.com/area/";
 var cutoff = 40;
 
 var Contacts = React.createClass({
-	/*counter : 0,
-	getInitialState: function () {
-		return {
-			path: [],
-			contacts: [],
-			descendents: {area: null, children: []},
-			descendent_contact_count: 0
-		};
-	},
-	count : function (n) {
-		this.counter += n;
-		console.log(this.counter);
-	},
-	getCount : function () {
-		return this.counter;
-	},
-	/*componentWillReceiveProps: function (new_props) {
-		console.log("Contacts area: " + new_props.area);
-		var done = 3;
-		var newState = {};
-		$.ajax({
-			url: url_base + new_props.area + "/path",
-			dataType: "json",
-			success: function (data) {
-				newState.path = data;
-				if (!--done) this.setState(newState);
-			}.bind(this)
-		});
-		$.ajax({
-			url: url_base + new_props.area + "/descendents",
-			dataType: "json",
-			success: function (data) {
-				newState.descendents = data;
-				if (!--done) this.setState(newState);
-			}.bind(this)
-		});
-		$.ajax({
-			url: url_base + new_props.area + "/descendent_contact_count",
-			dataType: "json",
-			success: function (data) {
-				newState.descendent_contact_count = data.contacts;
-				if (!--done) this.setState(newState);
-			}.bind(this)
-		})
-	},
-	componentWillMount : function () {
-		this.componentWillReceiveProps(this.props);
-	},*/
 	selectArea : function (area) {
 		this.props.onAreaSelect(area);
 	},
@@ -68,7 +20,9 @@ var Contacts = React.createClass({
 
 		var class_name = this.props.isSearching ? "hidden" : "";
 
-		if (this.props.showDescendents && this.props.area_info.descendent_contact_count > cutoff) {
+		if (!this.props.contact_info) {
+			return <p><img src="images/spinner_32.gif" /></p>;
+		} if (this.props.showDescendents && this.props.area_info.descendent_contact_count > cutoff) {
 
 			var explore = function (tree, depth) {
 				var sub_list = null;
@@ -106,9 +60,6 @@ var Contacts = React.createClass({
 		} else {
 
 			var contact_display = this.props.path.map(function (element) {
-				console.log("path");
-				console.log(this.props.contact_info);
-				console.log(this.props.path);
 				return <AreaContacts area={element} contacts={this.props.contact_info[element.area_id]} />;
 			}.bind(this));
 
