@@ -60,11 +60,11 @@ form .search_box {
 }
 .search_box ul li {
 	display:inline;
-	background-color:#8BE;
-	border:1px solid #369;
+	background-color:#556270;
+	color:#fff;
 	border-radius:3px;
-	font-size:16pt;
-	padding:3px;
+	font-size:13pt;
+	padding:7px;
 	margin-right:10px;
 	cursor:hand;
 }
@@ -129,23 +129,18 @@ ul.area_list li.highlighted {
 }*/
 
 
-table, td, th {
-	border:1px solid #999;
-}
+
 table {
 	border-width:2px;
+	text-align: left;
 }
 td, th {
 	padding:3px;
 }
+
 th {
-	font-size:8pt;
-	font-variant:small-caps;
-	height:10px;
-	line-height:10px;
-	padding-top:0px;
-	padding-bottom:0px;
-	border-bottom-width:2px;
+	border-bottom: 1px solid #666;
+	font-weight: 700;
 }
 
 .collection, .contact_table, .notes {
