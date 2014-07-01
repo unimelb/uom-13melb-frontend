@@ -33,6 +33,7 @@
     "jshint-loader": "~0.6.0",
     "grunt-contrib-copy": "~0.5.0",
     "grunt-contrib-clean": "~0.5.0",
-    "live-reload": "latest"
+    "live-reload": "latest",
+    "font-awesome": "~4.1.0"
   }
 }
