@@ -53,7 +53,7 @@ var Contacts = React.createClass({
 
 			return (
 				<div>
-					<h3>Descendents</h3>
+					<h3>Functional areas</h3>
 					<ul>{descendents}</ul>
 				</div>
 			);
