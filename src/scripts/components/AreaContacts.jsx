@@ -12,8 +12,6 @@ ZeroClipboard.config({
 	swfPath: "//cdnjs.cloudflare.com/ajax/libs/zeroclipboard/2.1.1/ZeroClipboard.swf"
 });
 
-var url_base = "http://uom-13melb.herokuapp.com/area/";
-
 var AreaContacts = React.createClass({
 	componentDidMount : function () {
 		setTimeout(function () {

@@ -9,8 +9,6 @@ require('../../styles/AreaList.css');
 
 var Contacts  = require("./Contacts.jsx");
 
-var url_base = "http://uom-13melb.herokuapp.com/area/";
-
 var AreaList = React.createClass({
 	handleClick: function (area_id) {
 		this.props.onClick(area_id);

@@ -38,7 +38,9 @@ var SearchBox = React.createClass({
 		) {
 			//this.props.onMoveResultCursor(key.key);
 			if (key.key == "Enter") {
-				this.refs.search.getDOMNode().value = "";
+				if (this.props.search_results.length) {
+					this.refs.search.getDOMNode().value = "";
+				}
 			}
 			key.preventDefault();
 		}
@@ -83,7 +85,6 @@ var SearchBox = React.createClass({
     	var loading = this.props.isLoading
     		? <p className="spinner"><img src="images/spinner_32.gif" /></p>
     		: null;
-    	//var progressbar_style = {"width" : this.props.progressBarWidth + "%"};
         return (
             <form className="search_form" onSubmit={this.handleSubmit}>
             	<div className="search_box" onClick={this.handleFauxBoxClick}>
@@ -96,7 +97,6 @@ var SearchBox = React.createClass({
                 {loading}
             </form>
         );
-        //<button>Submit (ENTER)</button> <button onClick={this.handleReset}>Reset (ESC)</button>
     }
 });
 

@@ -9,7 +9,6 @@ require('../../styles/Contacts.css');
 
 var AreaContacts = require("./AreaContacts.jsx");
 
-var url_base = "http://uom-13melb.herokuapp.com/area/";
 var cutoff = 40;
 
 var Contacts = React.createClass({
@@ -84,7 +83,7 @@ var Contacts = React.createClass({
 			var descendent_contacts = this.props.showDescendents && num_descendents
 				? <div><hr />{subcontact_display(this.props.area_info.descendents.children)}</div>
 				: num_descendents
-					? <p className="descendent_notice">{"Has " + num_descendents + " descendent areas; select to view."}</p>
+					? <p className="descendent_notice">{"Has " + num_descendents + " un-shown descendent contacts; select to view."}</p>
 					: null
 			;						
 			return (

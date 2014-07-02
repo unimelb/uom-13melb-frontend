@@ -1,3 +1,3 @@
 module.exports = {
-	base_url : "http://uom-13melb.herokuapp.com/area/"
+	base_url : "http://example.com/area/"
 }

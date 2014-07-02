@@ -4,6 +4,7 @@
 
 'use strict';
 
+var config = require("../config.js");
 var React = require('react/addons');
 var ReactTransitionGroup = React.addons.TransitionGroup;
 
@@ -14,7 +15,7 @@ var Contacts = require("./Contacts.jsx");
 
 var limit = 40;
 
-var url_base = "http://uom-13melb.herokuapp.com/area/";
+var url_base = config.base_url;
 var search_url = function (area) {
 	return url_base + area + "/search";
 }
@@ -268,6 +269,7 @@ var Uom13melbFrontendApp = React.createClass({
 					onReset={this.handleReset}
 					isLoading={this.state.isLoading}
 					area={this.state.area_id}
+					search_results={this.state.search_results}
 					tokens={this.state.tokens} />
 				<CurrentArea path={this.state.current_path} />
 				{body}
