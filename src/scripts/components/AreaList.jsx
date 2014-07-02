@@ -15,9 +15,6 @@ var AreaList = React.createClass({
 	handleClick: function (area_id) {
 		this.props.onClick(area_id);
 	},
-	componentWillReceiveProps : function (new_props) {
-		//this.state.selected = new_props.selected;
-	},
 	render: function () {
 		var area_list = this.props.areas.map(function (path, index) {
 			var area_id = path[path.length - 1]["area_id"];
@@ -36,7 +33,7 @@ var AreaList = React.createClass({
 				area_info={{descendent_contact_count : path[path.length - 1].descendent_contact_count}}
 				contact_info={this.props.contacts} />
 			;
-			
+
 			return (
 				<li key={area_id} className={class_name}>
 					<div className="area">

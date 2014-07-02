@@ -24,12 +24,11 @@ require('../../styles/reset.css');
 require('../../styles/main.css');
 
 var initialState = {
-	"search_results" : [],
-	"selected_area" : 0,
-	"current_path" : [],
-	"history" : ["root"],
-	progressBarWidth : 0,
-	//"isSearching" : false,
+	search_results : [],
+	selected_area : 0,
+	current_path : [],
+	history : ["root"],
+	isLoading : false,
 	tokens : [],
 	contacts : {"root" : []},
 	search_contacts : {},
@@ -62,7 +61,6 @@ var fetch_contact_info = function (areas, callback) {
 			return url_base + area + "/all_contacts";
 		}),
 		function (results) {
-			console.log(results);
 			var map = {};
 			areas.forEach(function (area, index) {
 				map[area] = results[index];
@@ -97,16 +95,16 @@ var Uom13melbFrontendApp = React.createClass({
 		this.lastSearchString = search_text;
 
 		if (search_text.length == 0) {
-
 			// clear result list
-			if (this.state.search_results.length) this.setState({search_results : []});
+			this.setState({
+				search_results : [],
+				isLoading : false
+			});
 		} else {
-			this.setState({progressBarWidth : 33});
+			this.setState({isLoading : true});
 
 			// do search
-			var new_state = {
-				selected_area : 0
-			};
+			var new_state = {selected_area : 0};
 			var current_area_id = path2area(this.state.current_path);
 
 			// fetch search results
@@ -119,30 +117,30 @@ var Uom13melbFrontendApp = React.createClass({
 
 					// fetch contacts for all areas in results
 					//new_state.search_results = data;
-					this.setState({
-						search_results : data,
-						search_contacts : false
-					});
-					var contacts_to_fetch = [];
-					data.forEach(function (path) {
-						path.forEach(function (area) {
-							contacts_to_fetch.push(area.area_id);
+					if (this.lastSearchString == search_text) {
+						this.setState({
+							search_results : data,
+							search_contacts : false,
+							isLoading : false
+						});
+						var contacts_to_fetch = [];
+						data.forEach(function (path) {
+							path.forEach(function (area) {
+								contacts_to_fetch.push(area.area_id);
+							}.bind(this));
 						}.bind(this));
-					}.bind(this));
 
-					this.setState({progressBarWidth : 66});
+						fetch_contact_info(contacts_to_fetch,
+							function (info) {
+								// TERMINAL: update state (if still valid)
 
-					fetch_contact_info(contacts_to_fetch,
-						function (info) {
-							// TERMINAL: update state (if still valid)
-
-							if (this.lastSearchString == search_text) {
-								this.setState({progressBarWidth : 0});	
-								new_state.search_contacts = info;
-								this.setState(new_state);
-							}
-						}.bind(this)
-					);
+								if (this.lastSearchString == search_text) {
+									new_state.search_contacts = info;
+									this.setState(new_state);
+								}
+							}.bind(this)
+						);
+					}
 				}.bind(this)
 			});
 		}
@@ -164,7 +162,7 @@ var Uom13melbFrontendApp = React.createClass({
 			}]);
 		}
 
-		this.setState({progressBarWidth : 33});
+		this.setState({isLoading : true});
 		
 		// fetch information on area
 		multi_ajax([
@@ -172,53 +170,55 @@ var Uom13melbFrontendApp = React.createClass({
 			url_base + area_id + "/descendents",
 			url_base + area_id + "/descendent_contact_count"
 		], function (results) {
-			this.setState({progressBarWidth : 66});
 
-			new_state.current_path = results[0];
-			new_state.area_info = {
-				descendents : results[1],
-				descendent_contact_count : results[2].contacts
-			};
-			new_state.contacts = false;
-			this.setState(new_state);
+			if (area_id == this.lastAreaSelected) {
 
-			// fetch contacts
-			var contacts_to_fetch = [];
-			if (new_state.area_info.descendent_contact_count <= limit) {
-				new_state.current_path.forEach(function (area) {
-					contacts_to_fetch.push(area.area_id);
-				});
-				var explore = function (area) {
-					contacts_to_fetch.push(area.area.area_id);
-					area.children.map(explore);
-				}
-				new_state.area_info.descendents.children.map(explore);
-			}
-			fetch_contact_info(contacts_to_fetch,
-				function (info) {
-					// if still valid
-					if (area_id == this.lastAreaSelected) {
-						this.setState({progressBarWidth : 0});
-						
-						// TERMINAL: update state
-						new_state.contacts = info;
-						this.setState(new_state);
+				new_state.current_path = results[0];
+				new_state.area_info = {
+					descendents : results[1],
+					descendent_contact_count : results[2].contacts
+				};
+				new_state.contacts = false;
+				new_state.isLoading = false;
+				this.setState(new_state);
+
+				// fetch contacts
+				var contacts_to_fetch = [];
+				if (new_state.area_info.descendent_contact_count <= limit) {
+					new_state.current_path.forEach(function (area) {
+						contacts_to_fetch.push(area.area_id);
+					});
+					var explore = function (area) {
+						contacts_to_fetch.push(area.area.area_id);
+						area.children.map(explore);
 					}
-				}.bind(this)
-			);
+					new_state.area_info.descendents.children.map(explore);
+				}
+				fetch_contact_info(contacts_to_fetch,
+					function (info) {
+						// if still valid
+						if (area_id == this.lastAreaSelected) {
+							
+							// TERMINAL: update state
+							new_state.contacts = info;
+							this.setState(new_state);
+						}
+					}.bind(this)
+				);
+			}
 		}.bind(this));
 
 	},
 	handleMoveResultCursor : function (key) {
 		var selected_area = this.state.selected_area;
 		if (key == "Down" && selected_area < this.state.search_results.length - 1) {
-			this.setState({"selected_area" : selected_area + 1});
+			this.setState({selected_area : selected_area + 1});
 		} else if (key == "Up" && selected_area > 0) {
-			this.setState({"selected_area" : selected_area - 1});
+			this.setState({selected_area : selected_area - 1});
 		} else if (key == "Enter") {
 			var search_results = this.state.search_results;
 			if (selected_area < search_results.length) {
-	  			this.handleAreaSelect(search_results[selected_area].slice(-1)[0].area_id);
+	  			this.handleAreaSelect(path2area(search_results[selected_area]));
 	  		}
 		}
 	},
@@ -227,14 +227,11 @@ var Uom13melbFrontendApp = React.createClass({
 		if (pressed == "Up" || pressed == "Down" || pressed == "Enter") {
 			this.handleMoveResultCursor(pressed);
 			key.preventDefault();
-		} else if (pressed == "U+001B") {
+		} else if (pressed == "U+001B") { // escape
 			this.handleReset();
 			key.preventDefault();
 		}
 	},
-	/*handleIsSearching : function (isSearching) {
-		this.setState({"isSearching" : isSearching});
-	},*/
 	handleCloseToken : function (area) {
 		var tokens = this.state.tokens;
 		for (var i = 0; i < tokens.length; i++) {
@@ -257,6 +254,7 @@ var Uom13melbFrontendApp = React.createClass({
 				showDescendents={true}
 				path={this.state.current_path}
 				area_info={this.state.area_info}
+				onAreaSelect={this.handleAreaSelect}
 				contact_info={this.state.contacts} />
 		;
 
@@ -268,8 +266,7 @@ var Uom13melbFrontendApp = React.createClass({
 					onMoveResultCursor={this.handleMoveResultCursor}
 					onCloseToken={this.handleCloseToken}
 					onReset={this.handleReset}
-					progressBarWidth={this.state.progressBarWidth}
-					//onIsSearching={this.handleIsSearching}
+					isLoading={this.state.isLoading}
 					area={this.state.area_id}
 					tokens={this.state.tokens} />
 				<CurrentArea path={this.state.current_path} />

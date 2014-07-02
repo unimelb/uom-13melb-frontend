@@ -21,7 +21,7 @@ var Contacts = React.createClass({
 		var class_name = this.props.isSearching ? "hidden" : "";
 
 		if (!this.props.contact_info) {
-			return <p><img src="images/spinner_32.gif" /></p>;
+			return <p className="spinner"><img src="images/spinner_32.gif" /></p>;
 		} if (this.props.showDescendents && this.props.area_info.descendent_contact_count > cutoff) {
 
 			var explore = function (tree, depth) {
@@ -38,7 +38,7 @@ var Contacts = React.createClass({
 					return false;
 				}.bind(this);
 				return (
-					<li>
+					<li key={tree.area.area_id}>
 						<a href="#" onClick={load_area}>{tree.area.name}</a>
 						<ul>
 							{sub_list}
@@ -60,7 +60,7 @@ var Contacts = React.createClass({
 		} else {
 
 			var contact_display = this.props.path.map(function (element) {
-				return <AreaContacts area={element} contacts={this.props.contact_info[element.area_id]} />;
+				return <AreaContacts key={element.area_id} area={element} contacts={this.props.contact_info[element.area_id]} />;
 			}.bind(this));
 
 			var subcontact_display = function (children) {
@@ -68,7 +68,7 @@ var Contacts = React.createClass({
 					var area_contacts = <AreaContacts area={child.area} contacts={this.props.contact_info[child.area.area_id]} />;
 					var subcontacts = subcontact_display(child.children);
 					return (
-						<div className="child_area">
+						<div key={child.area.area_id} className="child_area">
 							{area_contacts}
 							{subcontacts}
 						</div>
@@ -76,11 +76,16 @@ var Contacts = React.createClass({
 				}.bind(this));
 			}.bind(this);
 
-			var descendent_contacts = this.props.showDescendents
+			var num_descendents = this.props.area_info.descendent_contact_count || (
+				this.props.path.length
+					? this.props.path[this.props.path.length - 1].descendent_contact_count
+					: 0
+			);
+			var descendent_contacts = this.props.showDescendents && num_descendents
 				? <div><hr />{subcontact_display(this.props.area_info.descendents.children)}</div>
-				: /*this.state.descendent_contact_count
-					? <p className="descendent_notice">{"Has " + this.state.descendent_contact_count + " descendent areas; select to view."}</p>
-					: */null
+				: num_descendents
+					? <p className="descendent_notice">{"Has " + num_descendents + " descendent areas; select to view."}</p>
+					: null
 			;						
 			return (
 				<div className={class_name}>
