@@ -9,6 +9,8 @@ require('../../styles/CurrentArea.css');
 
 var CurrentArea = React.createClass({
 	render: function () {
+
+		// generate path string
 		var pathstr = this.props.path.map(function (path) {
 			return path.name;
 		}).join(" > ");

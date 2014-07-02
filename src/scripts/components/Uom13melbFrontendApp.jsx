@@ -22,6 +22,7 @@ var search_url = function (area) {
 
 // CSS
 require('../../styles/reset.css');
+require('../../styles/uom.min.css');
 require('../../styles/main.css');
 
 var initialState = {
@@ -93,19 +94,21 @@ var Uom13melbFrontendApp = React.createClass({
 	 * Main process 1: retrieving search results.
 	 */
 	handleSearch : function (search_text) {
+		if (search_text == this.lastSearchString) return;
 		this.lastSearchString = search_text;
 
 		if (search_text.length == 0) {
+
 			// clear result list
 			this.setState({
 				search_results : [],
 				isLoading : false
 			});
+
 		} else {
-			this.setState({isLoading : true});
 
 			// do search
-			var new_state = {selected_area : 0};
+			this.setState({isLoading : true});
 			var current_area_id = path2area(this.state.current_path);
 
 			// fetch search results
@@ -117,12 +120,12 @@ var Uom13melbFrontendApp = React.createClass({
 				success: function (data) {
 
 					// fetch contacts for all areas in results
-					//new_state.search_results = data;
 					if (this.lastSearchString == search_text) {
 						this.setState({
 							search_results : data,
 							search_contacts : false,
-							isLoading : false
+							isLoading : false,
+							selected_area : 0
 						});
 						var contacts_to_fetch = [];
 						data.forEach(function (path) {
@@ -133,11 +136,10 @@ var Uom13melbFrontendApp = React.createClass({
 
 						fetch_contact_info(contacts_to_fetch,
 							function (info) {
-								// TERMINAL: update state (if still valid)
 
+								// TERMINAL: update state (if still valid)
 								if (this.lastSearchString == search_text) {
-									new_state.search_contacts = info;
-									this.setState(new_state);
+									this.setState({search_contacts : info});
 								}
 							}.bind(this)
 						);
@@ -179,6 +181,13 @@ var Uom13melbFrontendApp = React.createClass({
 					descendents : results[1],
 					descendent_contact_count : results[2].contacts
 				};
+				if (!token_removed) {
+					var last_token = new_state.tokens[new_state.tokens.length - 1];
+					if (last_token.search_string == "") {
+						var ns_name = new_state.current_path[new_state.current_path.length - 1].name;
+						last_token.search_string = ns_name;
+					}
+				}
 				new_state.contacts = false;
 				new_state.isLoading = false;
 				this.setState(new_state);
@@ -197,10 +206,9 @@ var Uom13melbFrontendApp = React.createClass({
 				}
 				fetch_contact_info(contacts_to_fetch,
 					function (info) {
-						// if still valid
+						
+						// TERMINAL: update state if still valid
 						if (area_id == this.lastAreaSelected) {
-							
-							// TERMINAL: update state
 							new_state.contacts = info;
 							this.setState(new_state);
 						}
@@ -260,19 +268,20 @@ var Uom13melbFrontendApp = React.createClass({
 		;
 
 		return (
-			<div className="main">
-				<h1>13MELB</h1>
-				<SearchBox
-					onSearch={this.handleSearch}
-					onMoveResultCursor={this.handleMoveResultCursor}
-					onCloseToken={this.handleCloseToken}
-					onReset={this.handleReset}
-					isLoading={this.state.isLoading}
-					area={this.state.area_id}
-					search_results={this.state.search_results}
-					tokens={this.state.tokens} />
-				<CurrentArea path={this.state.current_path} />
-				{body}
+			<div className="page-inner">
+				<div role="main" className="main">
+					<section>
+						<SearchBox
+							onSearch={this.handleSearch}
+							onCloseToken={this.handleCloseToken}
+							isLoading={this.state.isLoading}
+							area={this.state.area_id}
+							search_results={this.state.search_results}
+							tokens={this.state.tokens} />
+						<CurrentArea path={this.state.current_path} />
+						{body}
+					</section>
+				</div>
 			</div>
 		);
 	}

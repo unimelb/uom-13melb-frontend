@@ -15,12 +15,7 @@ var SearchBox = React.createClass({
 		return {};
 	},
 	handleSubmit : function () {
-		//var search_text = this.refs.search.getDOMNode().value;
-		//this.props.onSearch(search_text);
 		return false;
-	},
-	handleReset : function () {
-		this.props.onReset();
 	},
 	handleKeyDown : function (key) {
 		if (key.key == "Escape") {
@@ -36,7 +31,6 @@ var SearchBox = React.createClass({
 			key.key == "ArrowDown" ||
 			key.key == "Enter"
 		) {
-			//this.props.onMoveResultCursor(key.key);
 			if (key.key == "Enter") {
 				if (this.props.search_results.length) {
 					this.refs.search.getDOMNode().value = "";
@@ -44,7 +38,6 @@ var SearchBox = React.createClass({
 			}
 			key.preventDefault();
 		}
-		//return false;
 	},
 	handleKeyUp : function (key) {
 		if (!(key.key == "ArrowUp" || key.key == "ArrowDown")) {
@@ -73,12 +66,16 @@ var SearchBox = React.createClass({
 		this.refs.search.getDOMNode().focus();
 	},
 	componentDidMount : function () {
-		this.componentWillReceiveProps();
+		this.refs.search.getDOMNode().focus();
 	},
     render : function () {
+    	var used_keys = {};
     	var tokens = this.props.tokens.map(function (token) {
     		var label = token.search_string ? token.search_string : " ";
-    		return <li key={token.prev_area} onClick={function () { this.handleRemoveToken(token.prev_area); }.bind(this)}>
+    		var key = token.prev_area;
+    		if (!(key in used_keys)) used_keys[key] = 0;
+    		used_keys[key]++;
+    		return <li key={key + "-" + used_keys[key]} onClick={function () { this.handleRemoveToken(token.prev_area); }.bind(this)}>
     			{label}
     		</li>;
     	}.bind(this));
@@ -91,7 +88,11 @@ var SearchBox = React.createClass({
             		<ul id="search_tokens" ref="search_tokens">
             			{tokens}
             		</ul>
-                	<input type="text" ref="search" onKeyDown={this.handleKeyDown} onKeyUp={this.handleKeyUp} />
+                	<input
+                		type="text" ref="search"
+                		onKeyDown={this.handleKeyDown}
+                		onKeyUp={this.handleKeyUp}
+                		onFocus={this.handleFocus} />
                 </div>
                 <div ref="search_shadow" className="search_shadow"></div>
                 {loading}

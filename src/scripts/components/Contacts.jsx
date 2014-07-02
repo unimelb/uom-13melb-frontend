@@ -14,23 +14,26 @@ var cutoff = 40;
 var Contacts = React.createClass({
 	selectArea : function (area) {
 		this.props.onAreaSelect(area);
+		return false;
 	},
 	render: function () {
 
-		var class_name = this.props.isSearching ? "hidden" : "";
-
 		if (!this.props.contact_info) {
-			return <p className="spinner"><img src="images/spinner_32.gif" /></p>;
-		} if (this.props.showDescendents && this.props.area_info.descendent_contact_count > cutoff) {
 
+			// still loading contact info, so spin
+			return <p className="spinner"><img src="images/spinner_32.gif" /></p>;
+
+		} else if (this.props.showDescendents && this.props.area_info.descendent_contact_count > cutoff) {
+
+			// too many descendents, show tree
 			var explore = function (tree, depth) {
 				var sub_list = null;
 				if (tree.children.length) {
 					if (depth) {
-						sub_list = tree.children.map(function (child) {
+						sub_list = <ul>{tree.children.map(function (child) {
 							return explore(child, depth - 1);
-						});
-					} else sub_list = <li>...</li>;
+						})}</ul>;
+					} else sub_list = <ul><li>...</li></ul>;
 				}
 				var load_area = function () {
 					this.selectArea(tree.area.area_id);
@@ -39,9 +42,7 @@ var Contacts = React.createClass({
 				return (
 					<li key={tree.area.area_id}>
 						<a href="#" onClick={load_area}>{tree.area.name}</a>
-						<ul>
-							{sub_list}
-						</ul>
+						{sub_list}
 					</li>
 				);
 			}.bind(this);
@@ -51,20 +52,27 @@ var Contacts = React.createClass({
 			});
 
 			return (
-				<div className={class_name}>
+				<div>
 					<h3>Descendents</h3>
 					<ul>{descendents}</ul>
 				</div>
 			);
 		} else {
 
-			var contact_display = this.props.path.map(function (element) {
-				return <AreaContacts key={element.area_id} area={element} contacts={this.props.contact_info[element.area_id]} />;
+			// show all contacts above, and below if set to
+			var contact_display = this.props.path.map(function (element, index) {
+				return <AreaContacts
+					key={element.area_id} area={element}
+					contacts={this.props.contact_info[element.area_id]}
+					onAreaSelect={index == this.props.path.length - 1 ? false : this.props.onAreaSelect} />;
 			}.bind(this));
 
 			var subcontact_display = function (children) {
 				return children.map(function (child) {
-					var area_contacts = <AreaContacts area={child.area} contacts={this.props.contact_info[child.area.area_id]} />;
+					var area_contacts = <AreaContacts
+						area={child.area}
+						contacts={this.props.contact_info[child.area.area_id]}
+						onAreaSelect={this.props.onAreaSelect} />;
 					var subcontacts = subcontact_display(child.children);
 					return (
 						<div key={child.area.area_id} className="child_area">
@@ -87,7 +95,7 @@ var Contacts = React.createClass({
 					: null
 			;						
 			return (
-				<div className={class_name}>
+				<div>
 					{contact_display}
 					{descendent_contacts}
 				</div>
