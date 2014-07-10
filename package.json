@@ -4,11 +4,13 @@
   "src": "src",
   "test": "test",
   "dist": "dist",
-  "mainInput": "Uom13melbFrontendApp",
+  "mainInput": "Router",
   "mainOutput": "main",
   "dependencies": {
     "react": "~0.10.0",
-    "zeroclipboard" : "latest"
+    "zeroclipboard" : "latest",
+    "backbone" : "latest",
+    "jquery" : "latest"
   },
   "devDependencies": {
     "grunt": "~0.4.4",

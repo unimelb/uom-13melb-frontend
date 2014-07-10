@@ -5,8 +5,8 @@
 'use strict';
 
 var config = require("../config.js");
+var common = require("../common.js");
 var React = require('react/addons');
-var ReactTransitionGroup = React.addons.TransitionGroup;
 
 var SearchBox = require("./SearchBox.jsx");
 var CurrentArea = require("./CurrentArea.jsx");
@@ -40,44 +40,7 @@ var initialState = {
 	}
 };
 
-var multi_ajax = function(calls, callback) {
-	var count = calls.length;
-	if (!count) callback([]);
-	var results = [];
-	calls.forEach(function (call, index) {
-		if (!(call instanceof Object)) {
-			call = {url : call};
-		}
-		call.success = function (data) {
-			results[index] = data;
-			if (!--count) callback(results);
-		}
-		if (!call.dataType) call.dataType = "json";
-		$.ajax(call);
-	});
-}
-
-var fetch_contact_info = function (areas, callback) {
-	multi_ajax(
-		areas.map(function (area) {
-			return url_base + area + "/all_contacts";
-		}),
-		function (results) {
-			var map = {};
-			areas.forEach(function (area, index) {
-				map[area] = results[index];
-			});
-			callback(map);
-		}
-	);
-}
-
-var path2area = function (path) {
-	if (!path.length) return "root";
-	else return path[path.length -1].area_id;
-}
-
-var Uom13melbFrontendApp = React.createClass({
+var DirectoryBrowser = React.createClass({
 	lastSearchString : "",
 	lastAreaSelected : "",
 	getInitialState : function () {
@@ -85,9 +48,14 @@ var Uom13melbFrontendApp = React.createClass({
 	},
 	componentDidMount : function () {
 		document.addEventListener("keydown", this.handleKeyPress);
+		this.handleAreaSelect(this.props.area, true);
+	},
+	componentWillReceiveProps : function (new_props) {
+		this.handleAreaSelect(new_props.area);
 	},
 	handleReset : function () {
 		this.replaceState(initialState);
+		this.handleAreaSelect("root", true);
 	},
 
 	/**
@@ -109,7 +77,7 @@ var Uom13melbFrontendApp = React.createClass({
 
 			// do search
 			this.setState({isLoading : true});
-			var current_area_id = path2area(this.state.current_path);
+			var current_area_id = common.path2area(this.state.current_path);
 
 			// fetch search results
 			$.ajax({
@@ -134,7 +102,7 @@ var Uom13melbFrontendApp = React.createClass({
 							}.bind(this));
 						}.bind(this));
 
-						fetch_contact_info(contacts_to_fetch,
+						common.fetch_contact_info(contacts_to_fetch,
 							function (info) {
 
 								// TERMINAL: update state (if still valid)
@@ -161,14 +129,14 @@ var Uom13melbFrontendApp = React.createClass({
 		if (!token_removed) {
 			new_state.tokens = this.state.tokens.concat([{
 				search_string : this.lastSearchString,
-				prev_area : path2area(this.state.current_path)
+				prev_area : common.path2area(this.state.current_path)
 			}]);
 		}
 
 		this.setState({isLoading : true});
 		
 		// fetch information on area
-		multi_ajax([
+		common.multi_ajax([
 			url_base + area_id + "/path",
 			url_base + area_id + "/descendents",
 			url_base + area_id + "/descendent_contact_count"
@@ -183,7 +151,7 @@ var Uom13melbFrontendApp = React.createClass({
 				};
 				if (!token_removed) {
 					var last_token = new_state.tokens[new_state.tokens.length - 1];
-					if (last_token.search_string == "") {
+					if (last_token.search_string == "" && new_state.current_path.length) {
 						var ns_name = new_state.current_path[new_state.current_path.length - 1].name;
 						last_token.search_string = ns_name;
 					}
@@ -204,11 +172,13 @@ var Uom13melbFrontendApp = React.createClass({
 					}
 					new_state.area_info.descendents.children.map(explore);
 				}
-				fetch_contact_info(contacts_to_fetch,
+				common.fetch_contact_info(contacts_to_fetch,
 					function (info) {
 						
 						// TERMINAL: update state if still valid
 						if (area_id == this.lastAreaSelected) {
+							if ($("#search_box").val) $("#search_box").val("");
+							this.props.router.navigate("area/" + area_id);
 							new_state.contacts = info;
 							this.setState(new_state);
 						}
@@ -218,6 +188,10 @@ var Uom13melbFrontendApp = React.createClass({
 		}.bind(this));
 
 	},
+
+	/**
+	 * Keyboard controls for navigation.
+	 */
 	handleMoveResultCursor : function (key) {
 		var selected_area = this.state.selected_area;
 		if (key == "Down" && selected_area < this.state.search_results.length - 1) {
@@ -227,7 +201,7 @@ var Uom13melbFrontendApp = React.createClass({
 		} else if (key == "Enter") {
 			var search_results = this.state.search_results;
 			if (selected_area < search_results.length) {
-	  			this.handleAreaSelect(path2area(search_results[selected_area]));
+	  			this.handleAreaSelect(common.path2area(search_results[selected_area]));
 	  		}
 		}
 	},
@@ -241,6 +215,10 @@ var Uom13melbFrontendApp = React.createClass({
 			key.preventDefault();
 		}
 	},
+
+	/**
+	 * Close token (go back)
+	 */
 	handleCloseToken : function (area) {
 		var tokens = this.state.tokens;
 		for (var i = 0; i < tokens.length; i++) {
@@ -251,6 +229,10 @@ var Uom13melbFrontendApp = React.createClass({
 		}
 		this.handleAreaSelect(area, true);
 	},
+
+	/**
+	 * Render! Basically just passes data to sub-components.
+	 */
 	render: function() {
 
 		var body = this.state.search_results.length
@@ -258,6 +240,7 @@ var Uom13melbFrontendApp = React.createClass({
 					areas={this.state.search_results}
 					contacts={this.state.search_contacts}
 					selected={this.state.selected_area}
+					search_string={this.lastSearchString}
 					onClick={this.handleAreaSelect} />
 			: <Contacts
 				showDescendents={true}
@@ -287,6 +270,4 @@ var Uom13melbFrontendApp = React.createClass({
 	}
 });
 
-React.renderComponent(<Uom13melbFrontendApp />, document.getElementById('content')); // jshint ignore:line
-
-module.exports = Uom13melbFrontendApp;
+module.exports = DirectoryBrowser;

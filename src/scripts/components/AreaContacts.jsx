@@ -6,38 +6,8 @@
 
 var React = require('react/addons');
 require('../../styles/AreaContacts.css');
-var ZeroClipboard = require("zeroclipboard");
-
-ZeroClipboard.config({
-	swfPath: "//cdnjs.cloudflare.com/ajax/libs/zeroclipboard/2.1.1/ZeroClipboard.swf"
-});
-
-var zc_timeout;
 
 var AreaContacts = React.createClass({
-	componentDidMount : function () {
-		clearTimeout(zc_timeout);
-		zc_timeout = setTimeout(function () {
-			var cells = document.getElementsByClassName("clickable");
-			var client = new ZeroClipboard(cells);
-			client.on("ready", function (event) {
-				client.on("copy", function (event) {
-					var clipboard = event.clipboardData;
-					var to_copy = event.target.innerHTML;
-					var last_word = to_copy.split(" ").slice(-1)[0];
-					if (last_word.match(/^[0-9]{5}$/)) to_copy = last_word;
-					clipboard.setData("text/plain", last_word);
-				});
-				client.on("aftercopy", function (event) {
-					var target = event.target;
-					target.style.backgroundColor = "#CFC";
-					setTimeout(function () {
-						target.style.backgroundColor = "transparent";
-					}, 200);
-				});
-			});
-		}.bind(this), 200);
-	},
 	render: function () {
 		var collection_counter = 0;
 
@@ -49,7 +19,7 @@ var AreaContacts = React.createClass({
 
 		// headings to look for
 		var headings = [
-			"first_name", "last_name", "position", "phone", "email", "address", "location", "url", "note"
+			"name", "position", "phone", "email", "address", "location", "url", "note"
 		];
 
 		// function renders a contact table from a collection,
@@ -70,8 +40,14 @@ var AreaContacts = React.createClass({
 							cells["url"] = <td key="url"><a href={contact.url.url}>{contact.url.url}{note}</a></td>;
 							used_headings.push("url");
 						}
+					} else if (heading == "name" && (
+						"first_name" in contact.contact_info || "last_name" in contact.contact_info
+					)) {
+						name = contact.contact_info.first_name + " " || "";
+						name += contact.contact_info.last_name || "";
+						cells["name"] = <td key="name">{name}</td>;
+						used_headings.push("name");
 					} else if (heading in contact.contact_info) {
-
 						// add <td> for data in heading
 						used_headings.push(heading);
 						var class_name = heading == "phone" || heading == "email" ? "clickable" : "";
@@ -146,7 +122,7 @@ var AreaContacts = React.createClass({
 		} else title = this.props.area.name;
 
 		// return the area's contacts/note if either exist, otherwise return `nothing'
-		if (notes || contacts) {
+		if (notes || contacts || this.props.needsDivision) {
 		    return (
 				<div className="collection">
 					<h3>{title}</h3>

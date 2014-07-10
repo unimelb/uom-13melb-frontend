@@ -52,8 +52,8 @@ var SearchBox = React.createClass({
 			}
 
 			this.refs.search_shadow.getDOMNode().innerHTML = this.refs.search.getDOMNode().value;
-			var text_width = this.refs.search_shadow.getDOMNode().offsetWidth;
-			this.refs.search.getDOMNode().style.width = (text_width + 100) + "px";
+			var text_width = $(this.refs.search_shadow.getDOMNode()).width();
+			$(this.refs.search.getDOMNode()).css({width : (text_width + 75) + "px"});
 		}
 	},
 	handleFauxBoxClick : function () {
@@ -75,7 +75,10 @@ var SearchBox = React.createClass({
     		var key = token.prev_area;
     		if (!(key in used_keys)) used_keys[key] = 0;
     		used_keys[key]++;
-    		return <li key={key + "-" + used_keys[key]} onClick={function () { this.handleRemoveToken(token.prev_area); }.bind(this)}>
+    		return <li 
+    			key={key + "-" + used_keys[key]}
+    			title="Remove"
+    			onClick={function () { this.handleRemoveToken(token.prev_area); }.bind(this)}>
     			{label}
     		</li>;
     	}.bind(this));
@@ -90,9 +93,11 @@ var SearchBox = React.createClass({
             		</ul>
                 	<input
                 		type="text" ref="search"
+                		id="search_box"
                 		onKeyDown={this.handleKeyDown}
                 		onKeyUp={this.handleKeyUp}
                 		onFocus={this.handleFocus} />
+                	<hr className="clear" />
                 </div>
                 <div ref="search_shadow" className="search_shadow"></div>
                 {loading}
