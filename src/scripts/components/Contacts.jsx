@@ -85,7 +85,7 @@ var Contacts = React.createClass({
 		 * Loading... (i.e., an ancestor component is still retrieving the information)
 		 */
 		if (!this.props.contact_info) {
-			return <p className="spinner"><img src="images/spinner_32.gif" /></p>;
+			return <p className="spinner"><img src="//s3.amazonaws.com/uom-13melb/spinner_32.gif" /></p>;
 
 		/**
 		 * Show descendents (a.k.a. "functional areas")

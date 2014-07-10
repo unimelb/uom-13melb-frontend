@@ -83,7 +83,7 @@ var SearchBox = React.createClass({
     		</li>;
     	}.bind(this));
     	var loading = this.props.isLoading
-    		? <p className="spinner"><img src="images/spinner_32.gif" /></p>
+    		? <p className="spinner"><img src="//s3.amazonaws.com/uom-13melb/spinner_32.gif" /></p>
     		: null;
         return (
             <form className="search_form" onSubmit={this.handleSubmit}>

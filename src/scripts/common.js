@@ -18,7 +18,7 @@ module.exports = {
 		});
 	},
 	fetch_contact_info : function (areas, callback) {
-		multi_ajax(
+		this.multi_ajax(
 			areas.map(function (area) {
 				return url_base + area + "/all_contacts";
 			}),
