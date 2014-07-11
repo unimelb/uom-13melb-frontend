@@ -93,11 +93,11 @@ form .spinner {
 	content:" › ";
 }
 
-input[type=text] {
+.search_box input[type=text] {
 	width:100px;
 	float:left;
 }
-input[type=text], .search_shadow {
+.search_box input[type=text], .search_shadow {
 	font-size:16pt;
 	box-sizing:border-box;
 	/*display:inline;*/

@@ -5,7 +5,7 @@
 'use strict';
 
 var config = require("../config.js");
-var common = require("../common.js");
+var common = require("../common.jsx");
 var React = require('react/addons');
 
 var SearchBox = require("./SearchBox.jsx");
@@ -264,6 +264,7 @@ var DirectoryBrowser = React.createClass({
 						<CurrentArea path={this.state.current_path} />
 						{body}
 					</section>
+					<p><a href={"#manage/" + common.path2area(this.state.current_path)}>Manage</a></p>
 				</div>
 			</div>
 		);

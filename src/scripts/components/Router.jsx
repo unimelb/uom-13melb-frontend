@@ -17,7 +17,7 @@ var render_main = function (component) {
 var Workspace = Backbone.Router.extend({
 	routes: {
 		"": "default",
-		"area/:area" : "default",
+		"area(/:area)" : "default",
 		"manage(/:area)" : "manage"
 	},
 	default : function (area) {
@@ -26,7 +26,7 @@ var Workspace = Backbone.Router.extend({
 	},
 	manage : function (area) {
 		if (!area) area = "root";
-		render_main(<Manager area={area_id} router={this} />);
+		render_main(<Manager area={area} router={this} />);
 	}
 });
 

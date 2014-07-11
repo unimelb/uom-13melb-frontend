@@ -1,3 +1,3 @@
 module.exports = {
-	base_url : "http://example.com/area/"
+	base_url : "//example.com/area/"
 }
