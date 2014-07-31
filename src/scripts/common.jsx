@@ -42,5 +42,10 @@ module.exports = {
 		if (!path.length) return "root";
 		else return path[path.length -1].area_id;
 	},
-	loading : <p className="spinner"><img src="//s3.amazonaws.com/uom-13melb/spinner_32.gif" /></p>
+	loading : function (loading) {
+		return loading
+			? <p className="spinner"><img src="//s3.amazonaws.com/uom-13melb/spinner_32.gif" /></p>
+			: <p className="spinner"></p>
+		;
+	}
 };

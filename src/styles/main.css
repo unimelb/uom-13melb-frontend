@@ -3,6 +3,7 @@
 a {
 	text-decoration:none;
 	color:#005aa2;
+	cursor:pointer;
 }
 
 h2 {
@@ -34,6 +35,10 @@ hr {
 	margin:10px;
 }
 
+.collection_successors {
+	margin-left:10px;
+}
+
 /**
  * Main
  */
@@ -45,6 +50,12 @@ section, [role=main] section {
 	margin-right:auto;
 	padding-left:0px;
 	padding-right:0px;
+}
+
+p.spinner, p.not-spinner {
+	height:8px;
+	padding:10px 0px;
+	vertical-align:middle;
 }
 
 /**
@@ -308,4 +319,37 @@ ul {
 	list-style-type:disc;
 	margin-left:10px;
 	padding-left:10px;
+}
+
+/**
+ * Shelve
+ */
+
+ul.shelve, ul.shelve li {
+	list-style-type:none;
+	padding-bottom:0px;
+	margin-left:0px;
+	padding-left:0px;
+}
+ul.shelve li a {
+	float:left;
+	display:block;
+	list-style-type:none;
+	color:#004d40;
+	border:1px solid;
+	background-color:#b2dfdb;
+	padding:4px;
+	margin-right:4px;
+}
+
+/* Contact manager */
+
+.manager_lists {
+	float:left;
+	width:50%;
+	box-sizing:border-box;
+}
+
+.collection_manager {
+	border:1px solid #CCC;
 }

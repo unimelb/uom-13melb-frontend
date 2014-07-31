@@ -10,7 +10,12 @@ var config = require("../config.js");
 var common = require("../common.jsx");
 
 var ManagerChildrenList = require("./ManagerChildrenList.jsx");
-var ManagerContactList = require("./ManagerContactList.jsx");
+var ManagerCollectionList = require("./ManagerCollectionList.jsx");
+var ContactEditor = require("./ContactEditor.jsx");
+
+var domain = config.base_url.replace(/\/area\//g, "/");
+var collection_url = domain + "collection/";
+var area_url = domain + "area/";
 
 var Manager = React.createClass({
 	getInitialState : function () {
@@ -19,8 +24,16 @@ var Manager = React.createClass({
 			children : [],
 			contacts : [],
 			form_values : {},
-			loading : false
+			loading : false,
+			moving : [],
+			collectionOperation : false,
+			collectionOperationTarget : 0,
+			editingContact : null,
+			newContactCollection : 0
 		};
+	},
+	getCurrentArea : function () {
+		return common.path2area(this.state.path)
 	},
 	componentDidMount : function () {
 		this.handleAreaSelect(this.props.area);
@@ -40,7 +53,20 @@ var Manager = React.createClass({
 			}.bind(this)
 		});
 	},
-	handleAreaSelect : function (area_id) {
+	refresh_contacts : function () {
+		$.ajax({
+			url : config.base_url + common.path2area(this.state.path) + "/all_contacts",
+			type : "GET",
+			success : function (contacts) {
+				this.setState({
+					contacts : contacts,
+					loading : false
+				});
+			}.bind(this)
+		});
+	},
+	handleAreaSelect : function (area_id, change_url) {
+		if (change_url) this.props.router.navigate("manage/" + area_id);
 		this.setState({loading : true});
 		var url = config.base_url + area_id;
 		common.multi_ajax([
@@ -53,6 +79,7 @@ var Manager = React.createClass({
 				path : results[0],
 				children : results[1],
 				contacts : results[2],
+				editingContact : null,
 				form_values : {
 					name : area.name,
 					note : area.note
@@ -79,8 +106,27 @@ var Manager = React.createClass({
 		});
 		return false;
 	},
-	handleAreaMove : function () {
-
+	handlePlaceArea : function (area_to_move) {
+		this.setState({loading : true});
+		$.ajax({
+			url : config.base_url + area_to_move + "/parent",
+			type : "PUT",
+			data : {
+				"area_id" : this.getCurrentArea()
+			},
+			success : function () {
+				var new_moving = this.state.moving.filter(function (area) {
+					return area.area_id != area_to_move
+				});
+				this.setState({moving : new_moving});
+				this.refresh_children();
+			}.bind(this)
+		});
+	},
+	handleMoveChild : function (child) {
+		var new_moving = this.state.moving;
+		new_moving.push(child);
+		this.setState({moving : new_moving});
 	},
 	handleRemoveChild : function (child_id) {
 		$.ajax({
@@ -92,14 +138,14 @@ var Manager = React.createClass({
 		})
 	},
 	handleNewChild : function () {
-		var area_id = common.path2area(this.state.path);
+		var area_id = this.getCurrentArea();
 		this.setState({loading : true});
 		$.ajax({
 			url : config.base_url + area_id,
 			type : "POST",
 			data : {name : "New area"},
-			success : function () {
-				this.handleAreaSelect(area_id);
+			success : function (new_area) {
+				this.handleAreaSelect(new_area.area_id, true);
 			}.bind(this)
 		});
 	},
@@ -108,14 +154,127 @@ var Manager = React.createClass({
 		new_form_values[e.target.name] = e.target.value;
 		this.setState({form_values : new_form_values});
 	},
+	handleSplitCollection : function (collection_id, contact_ids) {
+		$.ajax({
+			url : collection_url + collection_id + "/contacts",
+			type : "DELETE",
+			data : {
+				contacts : contact_ids
+			},
+			success : function (new_collection) {
+				this.refresh_contacts();
+			}.bind(this)
+		});
+	},
+	handleMergeCollection : function (disappearing_collection_id) {
+		this.setState({
+			collectionOperation : "merge",
+			collectionOperationTarget : disappearing_collection_id
+		});
+	},
+	handleSelectCollection : function (collection_id) {
+		var target_id = this.state.collectionOperationTarget;
+		switch (this.state.collectionOperation) {
+			case "merge":
+				$.ajax({
+					url : collection_url + target_id,
+					type : "DELETE",
+					data : {
+						collection_id : collection_id
+					},
+					success : function (remaining_collection) {
+						this.refresh_contacts();
+					}.bind(this)
+				});
+				break;
+			case "link":
+				var note = window.prompt("Enter note for link");
+				$.ajax({
+					url : collection_url + collection_id + "/successors",
+					type : "POST",
+					data : {
+						collection_id : target_id,
+						note : note
+					},
+					success : function () {
+						this.refresh_contacts();
+					}.bind(this)
+				})
+				break;
+		}
+		this.setState({
+			collectionOperation : false
+		});
+	},
+	handleLinkCollection : function (successor_collection_id) {
+		this.setState({
+			collectionOperation : "link",
+			collectionOperationTarget : successor_collection_id
+		});
+	},
+	handleUnlinkCollection : function (pred_id, succ_id) { 
+		$.ajax({
+			url : collection_url + pred_id + "/successors",
+			type : "DELETE",
+			data : {
+				collection_id : succ_id
+			},
+			success : function () {
+				this.refresh_contacts();
+			}.bind(this)
+		})
+	},
+	handleCancelCollectionOperation : function () {
+		this.setState({
+			collectionOperation : false
+		});
+	},
+	handleCreateContact : function (collection_id) {
+		this.setState({
+			editingContact : 0,
+			newContactCollection : collection_id
+		});
+	},
+	handleEditContact : function (contact_id) {
+		this.setState({
+			editingContact : contact_id
+		});
+	},
+	handleSubmitContact : function (contact_info) {
+		if (this.state.editingContact !== 0) {
+			var collection;
+			var do_new_contact = function (collection) {
+
+			}
+			if (!this.state.newContactCollection) {
+				$.ajax({
+					url : area_url + path2area(this.state.path) + "/collections",
+					type : "POST",
+					success : do_new_contact
+				})
+			} else {
+				do_new_contact(this.state.newContactCollection);
+			}
+		} else {
+
+		}
+	},
+	handleCancelEditContact : function () {
+		this.setState({
+			editingContact : null
+		});
+	},
 	render: function () {
 		
 		var path = this.state.path.map(function (segment, index) {
 			if (index == this.state.path.length - 1) return segment.name;
 			else return (
-				<a key={segment.area_id} href={"#manage/" + segment.area_id}>
-					{segment.name + " › "}
-				</a>
+				<span>
+					<a key={segment.area_id} href={"#manage/" + segment.area_id}>
+						{segment.name}
+					</a>
+					{" › "}
+				</span>
 			);
 		}.bind(this));
 
@@ -126,13 +285,20 @@ var Manager = React.createClass({
 				<label htmlFor="area_note">Note:</label>
 				<input type="text" name="note" ref="note" value={this.state.form_values.note} onChange={this.handleFormEntry} />
 				<button onClick={this.handleAreaUpdate}>Update</button>
-				<button onClick={this.handleAreaMove}>Move to new parent</button>
 			</form>
 		);
 
-		var loading = this.state.loading
-			? loading
-			: null;
+		var moving_shelve = this.state.moving.map(function (area) {
+			return (
+				<li>
+					<a onClick={function () { this.handlePlaceArea(area.area_id); }.bind(this)}>
+						{area.name}
+					</a>
+				</li>
+			);
+		}.bind(this));
+
+		var loading = common.loading(this.state.loading);
 
 		return (
 			<div className="page-inner">
@@ -141,13 +307,41 @@ var Manager = React.createClass({
 						<h1>Manager</h1>
 						<h2>{path}</h2>
 						{loading}
+						<ul className="shelve">{moving_shelve}</ul>
+						<hr className="clear" />
 						{form}
-						<ManagerChildrenList
-							children={this.state.children}
-							onAreaSelect={this.handleAreaSelect}
-							onRemoveChild={this.handleRemoveChild}
-							onNewChild={this.handleNewChild} />
-						<ManagerContactList />
+						{
+							this.state.editingContact !== null
+								? <ContactEditor
+									contacts={this.state.contacts}
+									contact_id={this.state.editingContact}
+									onSubmitContact={this.handleSubmitContact}
+									onCancelEditContact={this.handleCancelEditContact} />
+								:
+									<div>
+										<ManagerChildrenList
+											moving={this.state.moving}
+											children={this.state.children}
+											onAreaSelect={this.handleAreaSelect}
+											onRemoveChild={this.handleRemoveChild}
+											onMoveChild={this.handleMoveChild}
+											onNewChild={this.handleNewChild} />
+										<ManagerCollectionList
+											contacts={this.state.contacts}
+											collectionOperation={this.state.collectionOperation}
+											collectionOperationTarget={this.state.collectionOperationTarget}
+											onCancelCollectionOperation={this.handleCancelCollectionOperation}
+											onSplitCollection={this.handleSplitCollection}
+											onMergeCollection={this.handleMergeCollection}
+											onSelectCollection={this.handleSelectCollection}
+											onLinkCollection={this.handleLinkCollection}
+											onUnlinkCollection={this.handleUnlinkCollection}
+											onCreateContact={this.handleCreateContact}
+											onEditContact={this.handleEditContact}
+										/>
+									</div>
+						}
+						<hr className="clear" />
 					</section>
 				</div>
 			</div>
