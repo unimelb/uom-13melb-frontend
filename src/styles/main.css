@@ -39,6 +39,12 @@ hr {
 	margin-left:10px;
 }
 
+input[type=text], input[type=text]:active {
+	-webkit-appearance:none;
+	border:1px solid #CCC;
+	padding:2px;
+}
+
 /**
  * Main
  */
@@ -344,6 +350,9 @@ ul.shelve li a {
 
 /* Contact manager */
 
+.manager input, .manager label {
+	font-size:10pt;
+}
 .manager_lists {
 	float:left;
 	width:50%;
@@ -352,4 +361,13 @@ ul.shelve li a {
 
 .collection_manager {
 	border:1px solid #CCC;
+}
+
+.contact-editor label {
+	position:relative;
+	display:block;
+}
+.contact-editor label input {
+	position:absolute;
+	left:100px;
 }

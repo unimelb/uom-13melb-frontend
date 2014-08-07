@@ -16,6 +16,7 @@ var ContactEditor = require("./ContactEditor.jsx");
 var domain = config.base_url.replace(/\/area\//g, "/");
 var collection_url = domain + "collection/";
 var area_url = domain + "area/";
+var contact_url = domain + "contact/";
 
 var Manager = React.createClass({
 	getInitialState : function () {
@@ -166,6 +167,25 @@ var Manager = React.createClass({
 			}.bind(this)
 		});
 	},
+	handleDeleteContacts : function (collection_id, contact_ids) {
+		var remaining = contact_ids.length;
+		this.setState({loading : true});
+		contact_ids.forEach(function (contact_id) {
+			$.ajax({
+				url : contact_url + contact_id,
+				type : "DELETE",
+				data : {
+					collection_id : collection_id
+				},
+				success : function (contact) {
+					if (!--remaining) {
+						this.setState({loading : false});
+						this.refresh_contacts();
+					}
+				}.bind(this)
+			})
+		}.bind(this));
+	},
 	handleMergeCollection : function (disappearing_collection_id) {
 		this.setState({
 			collectionOperation : "merge",
@@ -241,28 +261,62 @@ var Manager = React.createClass({
 		});
 	},
 	handleSubmitContact : function (contact_info) {
-		if (this.state.editingContact !== 0) {
+		console.log("submit contact");
+		if (this.state.editingContact === 0) {
+			console.log("create");
 			var collection;
-			var do_new_contact = function (collection) {
-
-			}
+			var do_new_contact = function (collection_id) {
+				$.ajax({
+					url : collection_url + collection_id + "/contacts",
+					type : "POST",
+					data : contact_info,
+					success : function () {
+						this.setState({
+							editingContact : null
+						});
+						this.refresh_contacts();
+					}.bind(this)
+				})
+			}.bind(this);
+			this.setState({
+				loading : true
+			});
 			if (!this.state.newContactCollection) {
 				$.ajax({
-					url : area_url + path2area(this.state.path) + "/collections",
+					url : area_url + common.path2area(this.state.path) + "/collections",
 					type : "POST",
-					success : do_new_contact
-				})
+					success : function (data) {
+						do_new_contact(data.collection_id);
+					}.bind(this)
+				});
 			} else {
 				do_new_contact(this.state.newContactCollection);
 			}
 		} else {
-
+			$.ajax({
+				url : contact_url + this.state.editingContact,
+				type : "PUT",
+				data : contact_info,
+				success : function (data) {
+					this.setState({
+						editingContact : null
+					});
+					this.refresh_contacts();
+				}.bind(this)
+			});
 		}
 	},
 	handleCancelEditContact : function () {
 		this.setState({
 			editingContact : null
 		});
+	},
+	handleDidBulkImport : function (response) {
+		console.log(response);
+		if (response.error) alert(response.error);
+		else {
+			this.refresh_children();
+		}
 	},
 	render: function () {
 		
@@ -303,7 +357,7 @@ var Manager = React.createClass({
 		return (
 			<div className="page-inner">
 				<div role="main" className="main">
-					<section>
+					<section className="manager">
 						<h1>Manager</h1>
 						<h2>{path}</h2>
 						{loading}
@@ -320,11 +374,13 @@ var Manager = React.createClass({
 								:
 									<div>
 										<ManagerChildrenList
+											area_id={common.path2area(this.state.path)}
 											moving={this.state.moving}
 											children={this.state.children}
 											onAreaSelect={this.handleAreaSelect}
 											onRemoveChild={this.handleRemoveChild}
 											onMoveChild={this.handleMoveChild}
+											onDidBulkImport={this.handleDidBulkImport}
 											onNewChild={this.handleNewChild} />
 										<ManagerCollectionList
 											contacts={this.state.contacts}
@@ -338,6 +394,7 @@ var Manager = React.createClass({
 											onUnlinkCollection={this.handleUnlinkCollection}
 											onCreateContact={this.handleCreateContact}
 											onEditContact={this.handleEditContact}
+											onDeleteContacts={this.handleDeleteContacts}
 										/>
 									</div>
 						}

@@ -11,7 +11,7 @@ var DirectoryBrowser = require("./DirectoryBrowser.jsx");
 var Manager = require("./Manager.jsx");
 
 var render_main = function (component) {
-	React.renderComponent(component, document.getElementById('content')); // jshint ignore:line		
+	React.renderComponent(component, document.getElementById('main-content')); // jshint ignore:line		
 }
 
 var Workspace = Backbone.Router.extend({
