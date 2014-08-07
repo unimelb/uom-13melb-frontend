@@ -22,7 +22,7 @@ var search_url = function (area) {
 
 // CSS
 require('../../styles/reset.css');
-require('../../styles/uom.min.css');
+//require('../../styles/uom.min.css');
 require('../../styles/main.css');
 
 var initialState = {
