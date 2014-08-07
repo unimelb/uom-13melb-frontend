@@ -381,6 +381,7 @@ var Manager = React.createClass({
 											onRemoveChild={this.handleRemoveChild}
 											onMoveChild={this.handleMoveChild}
 											onDidBulkImport={this.handleDidBulkImport}
+											domain={domain}
 											onNewChild={this.handleNewChild} />
 										<ManagerCollectionList
 											contacts={this.state.contacts}

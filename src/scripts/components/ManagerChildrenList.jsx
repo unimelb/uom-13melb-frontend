@@ -43,7 +43,7 @@ var ManagerChildrenList = React.createClass({
 		}.bind(this)).concat([
 			<li key="new_child">
 				<button onClick={this.props.onNewChild}>New child</button>
-				<form encType="multipart/form-data" ref="bulk_import" action={"http://localhost:5000/area/" + this.props.area_id + "/upload"} method="post">
+				<form encType="multipart/form-data" ref="bulk_import" action={this.props.domain + "area/" + this.props.area_id + "/upload"} method="post">
 					<input type="file" name="datafile" />
 					<input type="submit" value="Bulk import" />
 				</form>
