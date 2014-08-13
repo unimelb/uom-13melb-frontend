@@ -1,39 +1,5 @@
 /* Stiziles */
 
-a {
-	text-decoration:none;
-	color:#005aa2;
-	cursor:pointer;
-}
-
-h2 {
-	/*font-size:16pt;*/
-	font-weight:bold;
-	line-height:1.5;
-	margin-bottom:10px;
-}
-h3 {
-	font-weight:bold;
-	line-height:2;
-	font-size:12pt;
-	padding:0px;
-	padding-bottom:5px;
-}
-
-p, ul, li, td, th {
-	font-size:10pt;
-}
-
-p {
-	padding-bottom:0px;
-}
-ul {
-	padding-bottom:0px;
-}
-
-hr {
-	margin:10px;
-}
 
 .collection_successors {
 	margin-left:10px;
@@ -68,7 +34,7 @@ p.spinner, p.not-spinner {
  * Search form
  */
 
-form {
+section form {
 	padding:0px;
 }
 
@@ -321,7 +287,7 @@ th {
 	margin-bottom: 1.5rem;
 }
 
-ul {
+section ul {
 	list-style-type:disc;
 	margin-left:10px;
 	padding-left:10px;
