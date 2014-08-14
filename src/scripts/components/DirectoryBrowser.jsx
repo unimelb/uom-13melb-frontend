@@ -162,10 +162,10 @@ var DirectoryBrowser = React.createClass({
 
 				// fetch contacts
 				var contacts_to_fetch = [];
+				new_state.current_path.forEach(function (area) {
+					contacts_to_fetch.push(area.area_id);
+				});
 				if (new_state.area_info.descendent_contact_count <= limit) {
-					new_state.current_path.forEach(function (area) {
-						contacts_to_fetch.push(area.area_id);
-					});
 					var explore = function (area) {
 						contacts_to_fetch.push(area.area.area_id);
 						area.children.map(explore);

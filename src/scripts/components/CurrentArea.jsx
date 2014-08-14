@@ -11,9 +11,10 @@ var CurrentArea = React.createClass({
 	render: function () {
 
 		// generate path string
-		var pathstr = this.props.path.map(function (path) {
-			return path.name;
-		}).join(" > ");
+		var pathstr = this.props.path.map(function (path, index) {
+			if (index == this.props.path.length - 1) return path.name;
+			else return <span><a href={"#area/" + path.area_id}>{path.name}</a> > </span>;
+		}.bind(this));
 
 		return (
 			<h2 className="current_area">

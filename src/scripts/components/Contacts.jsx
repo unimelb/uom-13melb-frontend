@@ -90,67 +90,7 @@ var Contacts = React.createClass({
 		/**
 		 * Show descendents (a.k.a. "functional areas")
 		 */
-		} else if (this.props.showDescendents && this.props.area_info.descendent_contact_count > cutoff) {
-
-			// too many descendents, show tree
-			var explore = function (tree, depth) {
-				var sub_list = null;
-				if (tree.children.length) {
-					if (depth) {
-						sub_list = <ul>{tree.children.map(function (child) {
-							return explore(child, depth - 1);
-						})}</ul>;
-					} else sub_list = <ul><li>...</li></ul>;
-				}
-				var load_area = function () {
-					this.selectArea(tree.area.area_id);
-					return false;
-				}.bind(this);
-				return (
-					<li key={tree.area.area_id}>
-						<a href="#" onClick={load_area}>{tree.area.name}</a>
-						{sub_list}
-					</li>
-				);
-			}.bind(this);
-
-			var descendents = this.props.area_info.descendents.children.map(function (child) {
-				var load_area = function () {
-					this.selectArea(child.area.area_id);
-					return false;
-				}.bind(this);
-				var subchildren = child.children.length
-					? <ul>{child.children.map(function (area) { return explore(area, 3); })}</ul>
-					: <p>No further functional areas.</p>;
-				return (
-					<div key={child.area.area_id} className="child-summary">
-						<div>
-							<h4><a href="#" onClick={load_area}>{child.area.name}</a></h4>
-							{subchildren}
-							<p className="show-more">
-								More...
-							</p>
-						</div>
-					</div>
-				)
-				
-			}.bind(this));
-
-			return (
-				<div>
-					<h3>Functional areas</h3>
-					<div className="descendents">
-						{descendents}
-					</div>
-					<hr className="clear" />
-				</div>
-			);
-
-		/**
-		 * Show individual contact display.
-		 */
 		} else {
-
 			// show all contacts above, and below if set to
 			var contact_display = this.props.path.map(function (element, index) {
 				return <AreaContacts
@@ -160,41 +100,104 @@ var Contacts = React.createClass({
 					onAreaSelect={index == this.props.path.length - 1 ? false : this.props.onAreaSelect} />;
 			}.bind(this));
 
-			var subcontact_display = function (children) {
-				return children.map(function (child) {
-					var area_contacts = <AreaContacts
-						area={child.area}
-						contacts={this.props.contact_info[child.area.area_id]}
-						needsDivision={children.length > 1}
-						onAreaSelect={this.props.onAreaSelect} />;
-					var subcontacts = subcontact_display(child.children);
-					return (
-						<div key={child.area.area_id} className="child_area">
-							{area_contacts}
-							{subcontacts}
-						</div>
-					) ;
-				}.bind(this));
-			}.bind(this);
+			if (this.props.showDescendents && this.props.area_info.descendent_contact_count > cutoff) {
 
-			var num_descendents = this.props.area_info.descendent_contact_count || (
-				this.props.path.length
-					? this.props.path[this.props.path.length - 1].descendent_contact_count
-					: 0
-			);
-			var descendent_contacts = this.props.showDescendents && num_descendents
-				? <div><hr />{subcontact_display(this.props.area_info.descendents.children)}</div>
-				: num_descendents
-					? <p className="descendent_notice">{"Has " + num_descendents + " un-shown descendent contacts; select to view."}</p>
-					: null
-			;						
-			return (
-				<div>
-					{contact_display}
-					{descendent_contacts}
-					<div ref="whiteout" className="whiteout"></div>
-				</div>
-			);
+				// too many descendents, show tree
+				var explore = function (tree, depth) {
+					var sub_list = null;
+					if (tree.children.length) {
+						if (depth) {
+							sub_list = <ul>{tree.children.map(function (child) {
+								return explore(child, depth - 1);
+							})}</ul>;
+						} else sub_list = <ul><li>...</li></ul>;
+					}
+					var load_area = function () {
+						this.selectArea(tree.area.area_id);
+						return false;
+					}.bind(this);
+					return (
+						<li key={tree.area.area_id}>
+							<a href="#" onClick={load_area}>{tree.area.name}</a>
+							{sub_list}
+						</li>
+					);
+				}.bind(this);
+
+				var descendents = this.props.area_info.descendents.children.map(function (child) {
+					var load_area = function () {
+						this.selectArea(child.area.area_id);
+						return false;
+					}.bind(this);
+					var subchildren = child.children.length
+						? <ul>{child.children.map(function (area) { return explore(area, 3); })}</ul>
+						: <p>No further functional areas.</p>;
+					return (
+						<div key={child.area.area_id} className="child-summary">
+							<div>
+								<h4><a href="#" onClick={load_area}>{child.area.name}</a></h4>
+								{subchildren}
+								<p className="show-more">
+									More...
+								</p>
+							</div>
+						</div>
+					)
+					
+				}.bind(this));
+
+				return (
+					<div>
+						{contact_display}
+						<h3>Functional areas</h3>
+						<div className="descendents">
+							{descendents}
+						</div>
+						<hr className="clear" />
+					</div>
+				);
+
+			/**
+			 * Show individual contact display.
+			 */
+			} else {
+
+				var subcontact_display = function (children) {
+					return children.map(function (child) {
+						var area_contacts = <AreaContacts
+							area={child.area}
+							contacts={this.props.contact_info[child.area.area_id]}
+							needsDivision={children.length > 1}
+							onAreaSelect={this.props.onAreaSelect} />;
+						var subcontacts = subcontact_display(child.children);
+						return (
+							<div key={child.area.area_id} className="child_area">
+								{area_contacts}
+								{subcontacts}
+							</div>
+						) ;
+					}.bind(this));
+				}.bind(this);
+
+				var num_descendents = this.props.area_info.descendent_contact_count || (
+					this.props.path.length
+						? this.props.path[this.props.path.length - 1].descendent_contact_count
+						: 0
+				);
+				var descendent_contacts = this.props.showDescendents && num_descendents
+					? <div><hr />{subcontact_display(this.props.area_info.descendents.children)}</div>
+					: num_descendents
+						? <p className="descendent_notice">{"Has " + num_descendents + " un-shown descendent contacts; select to view."}</p>
+						: null
+				;						
+				return (
+					<div>
+						{contact_display}
+						{descendent_contacts}
+						<div ref="whiteout" className="whiteout"></div>
+					</div>
+				);
+			}
 		}
 	}
 });
