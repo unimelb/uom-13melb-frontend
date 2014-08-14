@@ -36,6 +36,7 @@ p.spinner, p.not-spinner {
 
 section form {
 	padding:0px;
+	padding-top:20px;
 }
 
 form .search_box {
