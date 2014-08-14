@@ -138,7 +138,7 @@ var DirectoryBrowser = React.createClass({
 		// fetch information on area
 		common.multi_ajax([
 			url_base + area_id + "/path",
-			url_base + area_id + "/descendents",
+			url_base + area_id + "/descendents?depth=1",
 			url_base + area_id + "/descendent_contact_count"
 		], function (results) {
 
