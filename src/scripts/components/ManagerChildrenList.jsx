@@ -51,6 +51,7 @@ var ManagerChildrenList = React.createClass({
 		]);
 		return (
 			<div className="manager_lists">
+				<button onClick={this.props.onShowOrphans}>Switch to orphan view</button>
 				<h3>Children</h3>
 				<ul>{children_list}</ul>
 			</div>

@@ -30,6 +30,15 @@ p.spinner, p.not-spinner {
 	vertical-align:middle;
 }
 
+.loading {
+	position:fixed;
+	top:0px;
+	left:0px;
+	height:3px;
+	background-color:#3C3;
+	width:100%;
+}
+
 /**
  * Search form
  */

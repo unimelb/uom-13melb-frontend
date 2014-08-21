@@ -42,6 +42,7 @@ var AreaList = React.createClass({
 					<div className="area">
 						<a className="search_result"  name={"result-" + index} href="#" onClick={function () {
 							this.props.onClick(area_id);
+							return false;
 						}.bind(this)}>{area_path}</a>
 					</div>
 					<div className="contacts">

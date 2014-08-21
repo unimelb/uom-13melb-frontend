@@ -37,7 +37,8 @@ var initialState = {
 	area_info : {
 		descendents : {children : []},
 		descendent_contact_count : 0
-	}
+	},
+	load_percentage : 0
 };
 
 var DirectoryBrowser = React.createClass({
@@ -91,26 +92,49 @@ var DirectoryBrowser = React.createClass({
 					if (this.lastSearchString == search_text) {
 						this.setState({
 							search_results : data,
-							search_contacts : false,
+							search_contacts : {},
 							isLoading : false,
 							selected_area : 0
 						});
 						var contacts_to_fetch = [];
-						data.forEach(function (path) {
+						var batches = [];
+						data.forEach(function (path, index) {
 							path.forEach(function (area) {
 								contacts_to_fetch.push(area.area_id);
 							}.bind(this));
+							if (index % 3 == 2 || index == data.length - 1) {
+								batches.push(contacts_to_fetch);
+								contacts_to_fetch = [];	
+							}
 						}.bind(this));
 
-						common.fetch_contact_info(contacts_to_fetch,
-							function (info) {
-
-								// TERMINAL: update state (if still valid)
-								if (this.lastSearchString == search_text) {
-									this.setState({search_contacts : info});
-								}
-							}.bind(this)
-						);
+						var fetch_batch = function (batch_number) {
+							common.fetch_contact_info(batches[batch_number],
+								function (info) {
+									if (this.lastSearchString != search_text) return false;
+									else {
+										var existing_contacts = info;//this.state.search_contacts;
+										//console.log(this.state.search_contacts);
+										Object.keys(this.state.search_contacts).forEach(function (key) {
+											existing_contacts[key] = this.state.search_contacts[key];
+										}.bind(this));
+										this.setState({
+											search_contacts : existing_contacts,
+											load_percentage : (batch_number + 1) / batches.length
+										});
+										if (++batch_number < batches.length) {
+											fetch_batch(batch_number);
+										} else {
+											this.setState({
+												load_percentage : 0
+											});
+										}
+										return true;
+									}
+								}.bind(this)
+							);
+						}.bind(this);
+						if (batches.length) fetch_batch(0);
 					}
 				}.bind(this)
 			});
@@ -180,6 +204,7 @@ var DirectoryBrowser = React.createClass({
 							if ($("#search_box").val) $("#search_box").val("");
 							this.props.router.navigate("area/" + area_id);
 							new_state.contacts = info;
+							console.log(new_state.contacts);
 							this.setState(new_state);
 						}
 					}.bind(this)
@@ -235,6 +260,11 @@ var DirectoryBrowser = React.createClass({
 	 */
 	render: function() {
 
+		var load_percentage = this.state.load_percentage !== undefined
+			? <div className="loading" style={{width : this.state.load_percentage * 100 + "%"}}>&nbsp;</div>
+			: null
+		;
+
 		var body = this.state.search_results.length
 			? <AreaList
 					areas={this.state.search_results}
@@ -254,6 +284,7 @@ var DirectoryBrowser = React.createClass({
 			<div className="page-inner">
 				<div role="main" className="main">
 					<section>
+						{load_percentage}
 						<SearchBox
 							onSearch={this.handleSearch}
 							onCloseToken={this.handleCloseToken}

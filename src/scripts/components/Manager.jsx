@@ -10,6 +10,7 @@ var config = require("../config.js");
 var common = require("../common.jsx");
 
 var ManagerChildrenList = require("./ManagerChildrenList.jsx");
+var ManagerOrphanAreaList = require("./ManagerOrphanAreaList.jsx");
 var ManagerCollectionList = require("./ManagerCollectionList.jsx");
 var ContactEditor = require("./ContactEditor.jsx");
 
@@ -30,7 +31,8 @@ var Manager = React.createClass({
 			collectionOperation : false,
 			collectionOperationTarget : 0,
 			editingContact : null,
-			newContactCollection : 0
+			newContactCollection : 0,
+			orphan_areas : null
 		};
 	},
 	getCurrentArea : function () {
@@ -318,6 +320,18 @@ var Manager = React.createClass({
 			this.refresh_children();
 		}
 	},
+	handleViewOrphans : function () {
+		$.ajax({
+			url : domain + "orphan/area",
+			type : "GET",
+			success : function (data) {
+				this.setState({orphan_areas : data});
+			}.bind(this)
+		})
+	},
+	handleHideOrphans : function () {
+		this.setState({orphan_areas : null});
+	},
 	render: function () {
 		
 		var path = this.state.path.map(function (segment, index) {
@@ -364,16 +378,20 @@ var Manager = React.createClass({
 						<ul className="shelve">{moving_shelve}</ul>
 						<hr className="clear" />
 						{form}
-						{
-							this.state.editingContact !== null
-								? <ContactEditor
-									contacts={this.state.contacts}
-									contact_id={this.state.editingContact}
-									onSubmitContact={this.handleSubmitContact}
-									onCancelEditContact={this.handleCancelEditContact} />
-								:
-									<div>
-										<ManagerChildrenList
+						{this.state.editingContact !== null
+							? <ContactEditor
+								contacts={this.state.contacts}
+								contact_id={this.state.editingContact}
+								onSubmitContact={this.handleSubmitContact}
+								onCancelEditContact={this.handleCancelEditContact} />
+							:
+								<div>
+									{this.state.orphan_areas
+										? <ManagerOrphanAreaList
+											orphans={this.state.orphan_areas}
+											onMoveChild={this.handleMoveChild}
+											onHideOrphans={this.handleHideOrphans} />
+										: <ManagerChildrenList
 											area_id={common.path2area(this.state.path)}
 											moving={this.state.moving}
 											children={this.state.children}
@@ -382,22 +400,24 @@ var Manager = React.createClass({
 											onMoveChild={this.handleMoveChild}
 											onDidBulkImport={this.handleDidBulkImport}
 											domain={domain}
-											onNewChild={this.handleNewChild} />
-										<ManagerCollectionList
-											contacts={this.state.contacts}
-											collectionOperation={this.state.collectionOperation}
-											collectionOperationTarget={this.state.collectionOperationTarget}
-											onCancelCollectionOperation={this.handleCancelCollectionOperation}
-											onSplitCollection={this.handleSplitCollection}
-											onMergeCollection={this.handleMergeCollection}
-											onSelectCollection={this.handleSelectCollection}
-											onLinkCollection={this.handleLinkCollection}
-											onUnlinkCollection={this.handleUnlinkCollection}
-											onCreateContact={this.handleCreateContact}
-											onEditContact={this.handleEditContact}
-											onDeleteContacts={this.handleDeleteContacts}
-										/>
-									</div>
+											onNewChild={this.handleNewChild}
+											onShowOrphans={this.handleViewOrphans} />
+									}
+									<ManagerCollectionList
+										contacts={this.state.contacts}
+										collectionOperation={this.state.collectionOperation}
+										collectionOperationTarget={this.state.collectionOperationTarget}
+										onCancelCollectionOperation={this.handleCancelCollectionOperation}
+										onSplitCollection={this.handleSplitCollection}
+										onMergeCollection={this.handleMergeCollection}
+										onSelectCollection={this.handleSelectCollection}
+										onLinkCollection={this.handleLinkCollection}
+										onUnlinkCollection={this.handleUnlinkCollection}
+										onCreateContact={this.handleCreateContact}
+										onEditContact={this.handleEditContact}
+										onDeleteContacts={this.handleDeleteContacts}
+									/>
+								</div>
 						}
 						<hr className="clear" />
 					</section>

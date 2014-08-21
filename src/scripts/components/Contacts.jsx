@@ -99,9 +99,10 @@ var Contacts = React.createClass({
 					search_string={this.props.search_string}
 					onAreaSelect={index == this.props.path.length - 1 ? false : this.props.onAreaSelect} />;
 			}.bind(this));
+			console.log(this.props.path);
 
 			if (this.props.showDescendents && this.props.area_info.descendent_contact_count > cutoff) {
-
+				console.log('too many descendents');
 				// too many descendents, show tree
 				var explore = function (tree, depth) {
 					var sub_list = null;
@@ -145,6 +146,7 @@ var Contacts = React.createClass({
 					)
 					
 				}.bind(this));
+				//console.log(this.props.area_info.map(function (area) { return area.area_id}));
 
 				return (
 					<div>
@@ -161,7 +163,6 @@ var Contacts = React.createClass({
 			 * Show individual contact display.
 			 */
 			} else {
-
 				var subcontact_display = function (children) {
 					return children.map(function (child) {
 						var area_contacts = <AreaContacts
