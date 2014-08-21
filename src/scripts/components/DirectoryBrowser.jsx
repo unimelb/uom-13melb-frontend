@@ -81,63 +81,63 @@ var DirectoryBrowser = React.createClass({
 			var current_area_id = common.path2area(this.state.current_path);
 
 			// fetch search results
-			$.ajax({
+			common.multi_ajax([{
 				url: search_url(current_area_id),
 				dataType: "json",
 				type: "GET",
 				data: {q : search_text},
-				success: function (data) {
+			}], function (data) {
+					data = data[0];
 
-					// fetch contacts for all areas in results
-					if (this.lastSearchString == search_text) {
-						this.setState({
-							search_results : data,
-							search_contacts : {},
-							isLoading : false,
-							selected_area : 0
-						});
-						var contacts_to_fetch = [];
-						var batches = [];
-						data.forEach(function (path, index) {
-							path.forEach(function (area) {
-								contacts_to_fetch.push(area.area_id);
-							}.bind(this));
-							if (index % 3 == 2 || index == data.length - 1) {
-								batches.push(contacts_to_fetch);
-								contacts_to_fetch = [];	
-							}
+				// fetch contacts for all areas in results
+				if (this.lastSearchString == search_text) {
+					this.setState({
+						search_results : data,
+						search_contacts : {},
+						isLoading : false,
+						selected_area : 0
+					});
+					var contacts_to_fetch = [];
+					var batches = [];
+					data.forEach(function (path, index) {
+						path.forEach(function (area) {
+							contacts_to_fetch.push(area.area_id);
 						}.bind(this));
+						if (index % 3 == 2 || index == data.length - 1) {
+							batches.push(contacts_to_fetch);
+							contacts_to_fetch = [];	
+						}
+					}.bind(this));
 
-						var fetch_batch = function (batch_number) {
-							common.fetch_contact_info(batches[batch_number],
-								function (info) {
-									if (this.lastSearchString != search_text) return false;
-									else {
-										var existing_contacts = info;//this.state.search_contacts;
-										//console.log(this.state.search_contacts);
-										Object.keys(this.state.search_contacts).forEach(function (key) {
-											existing_contacts[key] = this.state.search_contacts[key];
-										}.bind(this));
+					var fetch_batch = function (batch_number) {
+						common.fetch_contact_info(batches[batch_number],
+							function (info) {
+								if (this.lastSearchString != search_text) return false;
+								else {
+									var existing_contacts = info;//this.state.search_contacts;
+									//console.log(this.state.search_contacts);
+									Object.keys(this.state.search_contacts).forEach(function (key) {
+										existing_contacts[key] = this.state.search_contacts[key];
+									}.bind(this));
+									this.setState({
+										search_contacts : existing_contacts,
+										load_percentage : (batch_number + 1) / batches.length
+									});
+									if (++batch_number < batches.length) {
+										fetch_batch(batch_number);
+									} else {
 										this.setState({
-											search_contacts : existing_contacts,
-											load_percentage : (batch_number + 1) / batches.length
+											load_percentage : 0
 										});
-										if (++batch_number < batches.length) {
-											fetch_batch(batch_number);
-										} else {
-											this.setState({
-												load_percentage : 0
-											});
-										}
-										return true;
 									}
-								}.bind(this)
-							);
-						}.bind(this);
-						if (batches.length) fetch_batch(0);
-					}
-				}.bind(this)
-			});
+									return true;
+								}
+							}.bind(this)
+						);
+					}.bind(this);
+					if (batches.length) fetch_batch(0);
+				}
+			}.bind(this));
 		}
 	},
 
