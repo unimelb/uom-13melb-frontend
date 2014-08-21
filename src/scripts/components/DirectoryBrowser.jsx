@@ -145,6 +145,7 @@ var DirectoryBrowser = React.createClass({
 	 * Main process 2: fetching the information for an area
 	 */
 	handleAreaSelect: function (area_id, token_removed) {
+		if (area_id == "root") token_removed = true;
 		this.lastAreaSelected = area_id;
 		var new_state = {
 			search_results : [],
