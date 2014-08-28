@@ -95,7 +95,7 @@ var DirectoryBrowser = React.createClass({
 						search_results : data,
 						search_contacts : {},
 						isLoading : false,
-						selected_area : 0
+						selected_area : -1
 					});
 					var contacts_to_fetch = [];
 					var batches = [];
@@ -222,13 +222,19 @@ var DirectoryBrowser = React.createClass({
 		var selected_area = this.state.selected_area;
 		if (key == "Down" && selected_area < this.state.search_results.length - 1) {
 			this.setState({selected_area : selected_area + 1});
-		} else if (key == "Up" && selected_area > 0) {
+		} else if (key == "Up" && selected_area > -1) {
 			this.setState({selected_area : selected_area - 1});
 		} else if (key == "Enter") {
 			var search_results = this.state.search_results;
+			if (selected_area == -1) selected_area = 0;
 			if (selected_area < search_results.length) {
 	  			this.handleAreaSelect(common.path2area(search_results[selected_area]));
 	  		}
+		}
+		if (selected_area != this.state.selected_area) {
+			$('html, body').animate({
+		    	scrollTop: $("#result-" + this.state.selected_area).offset().top
+		    }, 100);
 		}
 	},
 	handleKeyPress : function (key) {
@@ -284,19 +290,21 @@ var DirectoryBrowser = React.createClass({
 		return (
 			<div className="page-inner">
 				<div role="main" className="main">
-					<section>
-						{load_percentage}
+					<section id="result--1">
 						<SearchBox
 							onSearch={this.handleSearch}
 							onCloseToken={this.handleCloseToken}
-							isLoading={this.state.isLoading}
+							isLoading={this.state.isLoading || !this.state.contacts}
 							area={this.state.area_id}
 							search_results={this.state.search_results}
 							tokens={this.state.tokens} />
-						<CurrentArea path={this.state.current_path} />
-						{body}
+						<div className="results">
+							<CurrentArea path={this.state.current_path} />
+							{load_percentage}
+							{body}
+							<p><a href={"#manage/" + common.path2area(this.state.current_path)}>Manage</a></p>
+						</div>
 					</section>
-					<p><a href={"#manage/" + common.path2area(this.state.current_path)}>Manage</a></p>
 				</div>
 			</div>
 		);

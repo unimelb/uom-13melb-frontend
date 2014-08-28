@@ -53,6 +53,7 @@ var SearchBox = React.createClass({
 
 			this.refs.search_shadow.getDOMNode().innerHTML = this.refs.search.getDOMNode().value;
 			var text_width = $(this.refs.search_shadow.getDOMNode()).width();
+			if (text_width < 175) text_width = 175;
 			$(this.refs.search.getDOMNode()).css({width : (text_width + 75) + "px"});
 		}
 	},
@@ -85,6 +86,7 @@ var SearchBox = React.createClass({
     	var loading = this.props.isLoading
     		? <p className="spinner"><img src="//s3.amazonaws.com/uom-13melb/spinner_32.gif" /></p>
     		: null;
+    	//loading = null;
         return (
             <form className="search_form" onSubmit={this.handleSubmit}>
             	<div className="search_box" onClick={this.handleFauxBoxClick}>
@@ -93,6 +95,7 @@ var SearchBox = React.createClass({
             		</ul>
                 	<input
                 		type="text" ref="search"
+                		placeholder="enter your search term"
                 		id="search_box"
                 		onKeyDown={this.handleKeyDown}
                 		onKeyUp={this.handleKeyUp}

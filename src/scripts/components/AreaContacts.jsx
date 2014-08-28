@@ -12,15 +12,17 @@ var AreaContacts = React.createClass({
 		var collection_counter = 0;
 
 		// notes text (present of the area has a note)
-		var notes = this.props.area.note == null
+		var notes = this.props.area.note == null || this.props.area.note.trim() == ""
 			? null
 			: <p className="notes">{this.props.area.note}</p>
 		;
 
 		// headings to look for
-		var headings = [
-			"name", "position", "phone", "email", "address", "location", "url", "note"
-		];
+		console.log(this.props.showDescendents);
+		var headings = this.props.showDescendents
+			? ["name", "position", "phone", "email", "address", "location", "url", "note"]
+			: ["name", "phone", "email", "note"]
+		;
 
 		// function renders a contact table from a collection,
 		// possibly recursing for successor collections
@@ -52,6 +54,9 @@ var AreaContacts = React.createClass({
 						used_headings.push(heading);
 						var class_name = heading == "phone" || heading == "email" ? "clickable" : "";
 						cells[heading] = <td key={heading} className={class_name}>{contact.contact_info[heading]}</td>;
+					} else if (!this.props.showDescendents) {
+						used_headings.push(heading);
+						cells[heading] = <td key={heading}>&mdash;</td>;
 					}
 				}.bind(this));
 
@@ -76,7 +81,7 @@ var AreaContacts = React.createClass({
 			});
 
 			// create table
-			var class_name = "contact_table";
+			var class_name = "contact_table" + (this.props.showDescendents ? " full" : " reduced");
 			var note_cell = null;
 			if (note) {
 				note_cell = <tr className="successor_note"><td colSpan={reduced_headings.length}>{note}</td></tr>;

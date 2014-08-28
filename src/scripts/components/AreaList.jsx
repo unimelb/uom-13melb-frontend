@@ -10,9 +10,14 @@ require('../../styles/AreaList.css');
 var Contacts  = require("./Contacts.jsx");
 
 var AreaList = React.createClass({
+	previous : -1,
 	componentDidUpdate : function () {
 		//console.log(window.location.hash);
 		//window.location.hash = "#result-" + this.props.selected;
+		/*if (this.props.selected != 0 || this.previous > -1) {
+			this.previous = this.props.selected;
+			
+		}*/
 	},
 	render: function () {
 
@@ -23,7 +28,7 @@ var AreaList = React.createClass({
 			var area_id = path[path.length - 1]["area_id"];
 			var area_path = path.map(function (path) {
 				return path.name;
-			}).join(" > ");
+			}).join(" / ");
 
 			// create contacts pane for area
 			var class_name = this.props.selected == index ? "highlighted" : "unhighlighted";
@@ -38,7 +43,7 @@ var AreaList = React.createClass({
 
 			// return list item with contacts
 			return (
-				<li key={area_id} className={class_name}>
+				<li key={area_id} id={"result-" + index} className={class_name}>
 					<div className="area">
 						<a className="search_result"  name={"result-" + index} href="#" onClick={function () {
 							this.props.onClick(area_id);
