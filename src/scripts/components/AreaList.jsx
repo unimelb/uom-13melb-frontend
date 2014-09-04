@@ -36,7 +36,7 @@ var AreaList = React.createClass({
 				showDescendents={false}
 				path={path}
 				search_string={this.props.search_string}
-				area_info={{descendent_contact_count : path[path.length - 1].descendent_contact_count}}
+				area_info={{descendent_contact_count : 0/*path[path.length - 1].descendent_contact_count*/}}
 				onAreaSelect={this.props.onClick}
 				contact_info={this.props.contacts} />
 			;

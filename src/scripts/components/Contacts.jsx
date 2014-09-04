@@ -175,7 +175,7 @@ var Contacts = React.createClass({
 			 * Show individual contact display.
 			 */
 			} else {
-				console.log("at Contacts: " + this.props.showDescendents);
+				//console.log("at Contacts: " + this.props.showDescendents);
 				var subcontact_display = function (children) {
 					return children.map(function (child) {
 						console.log("inside loop: " + this.props.showDescendents);

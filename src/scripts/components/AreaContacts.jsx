@@ -18,7 +18,7 @@ var AreaContacts = React.createClass({
 		;
 
 		// headings to look for
-		console.log(this.props.showDescendents);
+		//console.log(this.props.showDescendents);
 		var headings = this.props.showDescendents
 			? ["name", "position", "phone", "email", "address", "location", "url", "note"]
 			: ["name", "phone", "email", "note"]

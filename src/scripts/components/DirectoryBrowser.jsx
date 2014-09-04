@@ -151,12 +151,13 @@ var DirectoryBrowser = React.createClass({
 			search_results : [],
 			history : this.state.history.concat([area_id])
 		};
-		if (!token_removed) {
+		if (!token_removed && this.lastSearchString != "") {
 			new_state.tokens = this.state.tokens.concat([{
 				search_string : this.lastSearchString,
 				prev_area : common.path2area(this.state.current_path)
 			}]);
 		}
+		this.lastSearchString = "";
 
 		this.setState({isLoading : true});
 		
@@ -174,7 +175,7 @@ var DirectoryBrowser = React.createClass({
 					descendents : results[1],
 					descendent_contact_count : results[2].contacts
 				};
-				if (!token_removed) {
+				if (!token_removed && this.lastSearchString != "") {
 					var last_token = new_state.tokens[new_state.tokens.length - 1];
 					if (last_token.search_string == "" && new_state.current_path.length) {
 						var ns_name = new_state.current_path[new_state.current_path.length - 1].name;
