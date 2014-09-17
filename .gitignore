@@ -33,3 +33,7 @@ dist
 src/scripts/main.js
 src/scripts/config.js
 env_vars
+
+.editorconfig
+.jshintrc
+npm-debug.log

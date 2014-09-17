@@ -152,9 +152,9 @@ var Contacts = React.createClass({
 
 				var descendent_groups = [];
 				var descendent_group = [];
-				descendents.forEach(function (desc) {
+				descendents.forEach(function (desc, index) {
 					descendent_group.push(desc);
-					if (descendent_group.length == 4) {
+					if (descendent_group.length == 4 || index == descendents.length - 1) {
 						descendent_group.push(<hr className="clear" />);
 						descendent_groups.push(<div className="descendent-group">{descendent_group}</div>);
 						descendent_group = [];

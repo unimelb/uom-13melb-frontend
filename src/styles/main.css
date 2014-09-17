@@ -30,7 +30,7 @@ a, main a, main a:hover, a:hover, .clickable {
 	color:#0070C8;
 	text-decoration:underline;
 }
-a, main a, main a:hover, a:hover {
+a, main a, main a:hover, a:hover, .main a, .main a:hover {
 	border-bottom:none;
 }
 
@@ -264,6 +264,10 @@ ul.area_list li .area a:after {
 	content:"view this area";
 	text-decoration:underline;
 	color:#FFF;
+}
+
+main ul li, .link-block li li {
+	background:none;
 }
 /*ul.area_list li.unhighlighted .contacts {
 	display:none;
