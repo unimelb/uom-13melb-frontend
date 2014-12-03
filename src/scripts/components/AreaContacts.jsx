@@ -49,6 +49,10 @@ var AreaContacts = React.createClass({
 						name += contact.contact_info.last_name || "";
 						cells["name"] = <td key="name">{name}</td>;
 						used_headings.push("name");
+					} else if (heading == "note" && !("first_name" in contact.contact_info || "last_name" in contact.contact_info)) {
+						console.log("setting name to note");
+						cells["name"] = <td key="name"><em>{contact.contact_info.note}</em></td>;
+						used_headings.push("name");
 					} else if (heading in contact.contact_info) {
 						// add <td> for data in heading
 						used_headings.push(heading);
@@ -68,7 +72,7 @@ var AreaContacts = React.createClass({
 			var reduced_headings = headings.reduce(function (acc, heading) {
 				return used_headings.indexOf(heading) > -1 ? acc.concat([heading]) : acc;
 			}, []);
-			var head_row = <tr>{reduced_headings.map(function (heading) {
+			var head_row = <tr className="header">{reduced_headings.map(function (heading) {
 				return <th key={heading}>{heading}</th>
 			})}</tr>;
 
@@ -88,7 +92,7 @@ var AreaContacts = React.createClass({
 				class_name += " successor";
 			}
 			var table = data_rows.length
-				? <table className={class_name}>{note_cell}{head_row}{data_rows}</table>
+				? <table className={class_name}><thead>{note_cell}{head_row}</thead><tbody>{data_rows}</tbody></table>
 				: null
 			;
 

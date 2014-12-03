@@ -44,28 +44,37 @@ var ContactEditor = React.createClass({
 		var form_inputs = [];
 		if (this.props.contact_id) contact = dfs(this.props.contacts, this.props.contact_id);
 		fields.forEach(function (key) {
+			var label = (key.charAt(0).toUpperCase() + key.slice(1)).replace("_"," ");
 			if (contact && contact.contact_info[key]) {
 				contact_info[key] = contact.contact_info[key];
 			} else {
 				contact_info[key] = "";
 			}
 			form_inputs.push(
-				<label key={key}>{key}
-					<input
-						type="text" ref={key} name={key}
-						value={this.state.form_values[key] || contact_info[key]}
-						onChange={this.handleFormEntry} />
-				</label>
+				<div>
+					<label key={key}>{label}
+						<input
+							type="text" ref={key} name={key}
+							value={this.state.form_values[key] || contact_info[key]}
+							onChange={this.handleFormEntry} />
+					</label>
+				</div>
 			);
 		}.bind(this));
 		return (
 			<div className="contact-editor">
-				<h3>Edit contact</h3>
-				{form_inputs}
-				<button onClick={function () {
-					this.props.onSubmitContact(this.state.form_values)
-				}.bind(this)}>Update</button>
-				<button onClick={this.props.onCancelEditContact}>Cancel</button>
+				<h1>Edit contact</h1>
+				<form>
+					<fieldset>
+						{form_inputs}
+					</fieldset>
+					<footer>
+						<input type="submit" onClick={function () {
+							this.props.onSubmitContact(this.state.form_values)
+						}.bind(this)} value="Update" />&nbsp;
+						<a className="button soft" onClick={this.props.onCancelEditContact}>Cancel</a>
+					</footer>
+				</form>
 			</div>
 		);
 	}

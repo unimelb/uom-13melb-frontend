@@ -138,19 +138,17 @@ var Contacts = React.createClass({
 					}
 					var subchildren = child.children.length
 						? <ul>{child_lis}</ul>
-						: <p>No further functional areas.</p>;
+						: <ul><li>No further functional areas.</li></ul>;
 					return (
-						<div key={child.area.area_id} className="child-summary">
-							<div>
-								<h4><a href="#" onClick={load_area}>{child.area.name}</a></h4>
-								{subchildren}
-							</div>
-						</div>
+						<li key={child.area.area_id} className="child-summary">
+							<h3><a href="#" onClick={load_area}>{child.area.name}</a></h3>
+							{subchildren}
+						</li>
 					)
 					
 				}.bind(this));
 
-				var descendent_groups = [];
+				/*var descendent_groups = [];
 				var descendent_group = [];
 				descendents.forEach(function (desc, index) {
 					descendent_group.push(desc);
@@ -159,15 +157,16 @@ var Contacts = React.createClass({
 						descendent_groups.push(<div className="descendent-group">{descendent_group}</div>);
 						descendent_group = [];
 					}
-				});
+				});*/
 
 				return (
 					<div>
 						{contact_display}
-						<div className="descendents">
-							{descendent_groups}
-						</div>
-						<hr className="clear" />
+						<section className="navigation-block-listing">
+							<ul>
+								{descendents}
+							</ul>
+						</section>
 					</div>
 				);
 

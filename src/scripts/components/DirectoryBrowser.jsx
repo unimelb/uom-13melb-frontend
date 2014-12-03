@@ -269,7 +269,7 @@ var DirectoryBrowser = React.createClass({
 	render: function() {
 
 		var load_percentage = this.state.load_percentage !== undefined
-			? <div className="loading" style={{width : this.state.load_percentage * 100 + "%"}}>&nbsp;</div>
+			? <div className="loading-bar" style={{width : this.state.load_percentage * 100 + "%"}}>&nbsp;</div>
 			: null
 		;
 
@@ -291,7 +291,7 @@ var DirectoryBrowser = React.createClass({
 		return (
 			<div className="page-inner">
 				<div role="main" className="main">
-					<section id="result--1">
+					<div className="result-section" id="result--1">
 						<SearchBox
 							onSearch={this.handleSearch}
 							onCloseToken={this.handleCloseToken}
@@ -303,9 +303,9 @@ var DirectoryBrowser = React.createClass({
 							<CurrentArea path={this.state.current_path} />
 							{load_percentage}
 							{body}
-							<p><a href={"#manage/" + common.path2area(this.state.current_path)}>Manage</a></p>
+							<p><a data-no-scroll href={"#manage/" + common.path2area(this.state.current_path)}>Manage</a></p>
 						</div>
-					</section>
+					</div>
 				</div>
 			</div>
 		);

@@ -25,10 +25,13 @@ var ManagerCollectionList = React.createClass({
 		this.props.onDeleteContacts(collection_id, checked);
 	},
 	render: function () {
-		var collection_recurse = function (collection) {
+		console.log("render called");
+		var collection_recurse = function (collection, i) {
 			var collection_id = collection.collection_id;
+			var faded = false;
 			if (this.props.collectionOperation && this.props.collectionOperationTarget == collection_id) {
-				return null;
+				//return <div key={i}></div>;
+				faded = true;
 			}
 			var contacts = collection.contacts.map(function (contact) {
 				var info = contact.contact_info;
@@ -39,78 +42,107 @@ var ManagerCollectionList = React.createClass({
 						else return acc;
 					}, "");
 				return (
-					<li ref={contact.contact_id}>
+					<li ref={contact.contact_id} key={contact.contact_id}>
 						<input type="checkbox"
 							name={"coll" + collection_id}
 							value={contact.contact_id}
+							id={"contact" + contact.contact_id}
 						/>
-						{contact_label}
-						<button onClick={function () {
-							this.props.onEditContact(contact.contact_id)
-						}.bind(this)}>Edit</button>
+						<label htmlFor={"contact" + contact.contact_id}><span>{contact_label}</span></label>
+						<span className="controls">
+							<a onClick={function () {
+								this.props.onEditContact(contact.contact_id)
+							}.bind(this)}><svg className="icon" dangerouslySetInnerHTML={{__html: '<use xlink:href="#pen" />'}}></svg> Edit</a>
+							<a onClick={function () {
+								if (confirm("Are you sure you want to delete this contact?")) {
+									this.props.onDeleteContact(collection_id, contact.contact_id);
+								}
+							}.bind(this)}><svg className="icon" dangerouslySetInnerHTML={{__html: '<use xlink:href="#trash" />'}}></svg> Delete</a>
+						</span>
 					</li>
 				);
 			}.bind(this));
-			var select_collection = this.props.collectionOperation == ""
+			//console.log(this.props.collectionOperation + ", " + collection_id);
+			var select_collection = (this.props.collectionOperation == "")
 				? null
-				: <button onClick={function () {
+				: <a className="button-small cta" onClick={function () {
 					this.props.onSelectCollection(collection_id)
-				}.bind(this)}>Select</button>;
+				}.bind(this)}>Select</a>;
 
-			contacts = <div ref={collection_id}>{[
-				<div ref={collection_id} className="collection_manager">
-					{select_collection}
-					<ul>{contacts}</ul>
-					<button onClick={function () {
-						this.handleSplitCollection(collection_id)
-					}.bind(this)}>Split (selected)</button>
-					<button onClick={function () {
-						this.handleDeleteContacts(collection_id);
-					}.bind(this)}>Delete (selected)</button>
-					<button onClick={function () {
-						this.props.onMergeCollection(collection_id)
-					}.bind(this)}>Join</button>
-					<button onClick={function () {
-						this.props.onLinkCollection(collection_id)
-					}.bind(this)}>Link (to predecessor)</button>
-					<button onClick={function () {
-						this.props.onCreateContact(collection_id);
-					}.bind(this)}>New contact</button>
+			var cancel = this.props.collectionOperation == ""
+				? null
+				: <a className="button-small warning" onClick={this.props.onCancelCollectionOperation}>Cancel {this.props.collectionOperation} operation</a>
+			;
+
+			contacts = <div key={collection_id * 3} className={faded ? "" : ""}>{[
+				<div key={collection_id * 3 + 2} className="collection_manager">
+					<h2>Contact group</h2>
+					{
+						select_collection
+							? (faded ? cancel : select_collection)
+							: <span>
+								<a className="button-small" onClick={function () {
+									this.props.onCreateContact(collection_id);
+								}.bind(this)}>New contact</a>&nbsp;
+								<a className="button-small">Add existing contact</a>&nbsp;
+								<a onClick={function () {
+									this.props.onMergeCollection(collection_id)
+								}.bind(this)} className="button-small soft">Merge</a>&nbsp;
+								<a onClick={function () {
+									this.props.onLinkCollection(collection_id)
+								}.bind(this)} className="button-small soft">Link</a>&nbsp;
+								<a onClick={function () {
+									this.handleSplitCollection(collection_id)
+								}.bind(this)} className="button-small soft">Split selected</a>
+							</span>
+					}
+					<form>
+						<fieldset>
+							<ul className="checklist">{contacts}</ul>
+						</fieldset>
+					</form>
 				</div>
 			].concat(collection.successors.map(function (successor) {
 				return (
-					<div ref={successor.collection.collection_id} className="collection_successors">
-						<p className="successor">
+					<div key={successor.collection.collection_id * 3 + 1} className="collection_successors">
+						<div className="successor">
 							{successor.note}
 							<button onClick={function () {
 								this.props.onUnlinkCollection(collection_id, successor.collection.collection_id);
 							}.bind(this)}>Remove link</button>
-						</p>
+						</div>
 						{collection_recurse(successor.collection)}
 					</div>
 				);
 			}.bind(this)))}</div>;
-
 			return contacts;
 		}.bind(this);
 
+		/*collection_recurse = function(collection, i) {
+			var cid = collection.collection_id;
+			//console.log(cid[i]);
+			return (
+				<div key={cid}>
+					Collection
+				</div>
+			);
+		}*/
+
+		console.log(this.props.contacts);
+
 		var collection_html = this.props.contacts.length
 			? this.props.contacts.map(collection_recurse)
-			: <button onClick={function () {
-				this.props.onCreateContact(null);
-			}.bind(this)}>New contact</button>
+			: []
 		;
 
-		var cancel = this.props.collectionOperation == ""
-			? null
-			: <button onClick={this.props.onCancelCollectionOperation}>Cancel {this.props.collectionOperation} operation</button>
-		;
+		console.log(collection_html);
+
+		
 
 		return (
 			<div className="manager_lists">
-				<h3>Contacts</h3>
-				<p>{collection_html}</p>
-				{cancel}
+				<h1>Contacts</h1>
+				<div>{collection_html}</div>
 			</div>
 		);
 	}

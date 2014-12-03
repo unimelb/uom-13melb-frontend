@@ -51,10 +51,10 @@ var SearchBox = React.createClass({
 				this.props.onSearch('');
 			}
 
-			this.refs.search_shadow.getDOMNode().innerHTML = this.refs.search.getDOMNode().value;
+			/*this.refs.search_shadow.getDOMNode().innerHTML = this.refs.search.getDOMNode().value;
 			var text_width = $(this.refs.search_shadow.getDOMNode()).width();
 			if (text_width < 175) text_width = 175;
-			$(this.refs.search.getDOMNode()).css({width : (text_width + 75) + "px"});
+			$(this.refs.search.getDOMNode()).css({width : (text_width + 75) + "px"});*/
 		}
 	},
 	handleFauxBoxClick : function () {
@@ -89,21 +89,23 @@ var SearchBox = React.createClass({
     	//loading = null;
         return (
             <form className="search_form" onSubmit={this.handleSubmit}>
-            	<div className="search_box" onClick={this.handleFauxBoxClick}>
-            		<ul id="search_tokens" ref="search_tokens">
-            			{tokens}
-            		</ul>
+              <fieldset>
+              	<div className="search_box inline" onClick={this.handleFauxBoxClick}>
+              		<ul id="search_tokens" ref="search_tokens">
+              			{tokens}
+              		</ul>
                 	<input
-                		type="text" ref="search"
+                		type="search" ref="search"
                 		placeholder="enter your search term"
                 		id="search_box"
                 		onKeyDown={this.handleKeyDown}
                 		onKeyUp={this.handleKeyUp}
                 		onFocus={this.handleFocus} />
-                	<hr className="clear" />
+                  <button type="submit" value="Go" className="search-button"><svg className="icon" role="img" dangerouslySetInnerHTML={{__html: '<use xlink:href="#icon-search"></use>'}}></svg></button>
                 </div>
-                <div ref="search_shadow" className="search_shadow"></div>
-                {loading}
+              </fieldset>
+              <div ref="search_shadow" className="search_shadow"></div>
+              {loading}
             </form>
         );
     }

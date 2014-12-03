@@ -188,6 +188,19 @@ var Manager = React.createClass({
 			})
 		}.bind(this));
 	},
+	handleDeleteContact : function (collection_id, contact_id) {
+		$.ajax({
+			url : contact_url + contact_id,
+			type : "DELETE",
+			data : {
+				collection_id : collection_id
+			},
+			success : function (contact) {
+				this.setState({loading : false});
+				this.refresh_contacts();
+			}.bind(this)
+		})
+	},
 	handleMergeCollection : function (disappearing_collection_id) {
 		this.setState({
 			collectionOperation : "merge",
@@ -262,6 +275,9 @@ var Manager = React.createClass({
 			editingContact : contact_id
 		});
 	},
+	handleLinkExistingContact : function () {
+
+	},
 	handleSubmitContact : function (contact_info) {
 		console.log("submit contact");
 		if (this.state.editingContact === 0) {
@@ -335,10 +351,10 @@ var Manager = React.createClass({
 	render: function () {
 		
 		var path = this.state.path.map(function (segment, index) {
-			if (index == this.state.path.length - 1) return segment.name;
+			if (index == this.state.path.length - 1) return <span key={index}>{segment.name}</span>;
 			else return (
-				<span>
-					<a key={segment.area_id} href={"#manage/" + segment.area_id}>
+				<span key={index}>
+					<a key={segment.area_id} data-no-scroll href={"#manage/" + segment.area_id}>
 						{segment.name}
 					</a>
 					{" › "}
@@ -348,17 +364,25 @@ var Manager = React.createClass({
 
 		var form = (
 			<form>
-				<label htmlFor="area_name">Name:</label>
-				<input type="text" name="name" ref="name" value={this.state.form_values.name} onChange={this.handleFormEntry} />
-				<label htmlFor="area_note">Note:</label>
-				<input type="text" name="note" ref="note" value={this.state.form_values.note} onChange={this.handleFormEntry} />
-				<button onClick={this.handleAreaUpdate}>Update</button>
+				<fieldset>
+					<div>
+						<label htmlFor="area_name">Name:</label>
+						<input type="text" name="name" ref="name" value={this.state.form_values.name} onChange={this.handleFormEntry} />
+					</div>
+					<div>
+						<label htmlFor="area_note">Note:</label>
+						<input type="text" name="note" ref="note" value={this.state.form_values.note} onChange={this.handleFormEntry} />
+					</div>
+				</fieldset>
+				<footer>
+					<input type="submit" onClick={this.handleAreaUpdate} value="Update" />
+				</footer>
 			</form>
 		);
 
-		var moving_shelve = this.state.moving.map(function (area) {
+		var moving_shelve = this.state.moving.map(function (area, i) {
 			return (
-				<li>
+				<li key={i}>
 					<a onClick={function () { this.handlePlaceArea(area.area_id); }.bind(this)}>
 						{area.name}
 					</a>
@@ -371,56 +395,63 @@ var Manager = React.createClass({
 		return (
 			<div className="page-inner">
 				<div role="main" className="main">
-					<section className="manager">
-						<h1>Manager</h1>
-						<h2>{path}</h2>
-						{loading}
-						<ul className="shelve">{moving_shelve}</ul>
-						<hr className="clear" />
-						{form}
-						{this.state.editingContact !== null
-							? <ContactEditor
-								contacts={this.state.contacts}
-								contact_id={this.state.editingContact}
-								onSubmitContact={this.handleSubmitContact}
-								onCancelEditContact={this.handleCancelEditContact} />
-							:
-								<div>
-									{this.state.orphan_areas
-										? <ManagerOrphanAreaList
-											orphans={this.state.orphan_areas}
-											onMoveChild={this.handleMoveChild}
-											onHideOrphans={this.handleHideOrphans} />
-										: <ManagerChildrenList
-											area_id={common.path2area(this.state.path)}
-											moving={this.state.moving}
-											children={this.state.children}
-											onAreaSelect={this.handleAreaSelect}
-											onRemoveChild={this.handleRemoveChild}
-											onMoveChild={this.handleMoveChild}
-											onDidBulkImport={this.handleDidBulkImport}
-											domain={domain}
-											onNewChild={this.handleNewChild}
-											onShowOrphans={this.handleViewOrphans} />
-									}
-									<ManagerCollectionList
-										contacts={this.state.contacts}
-										collectionOperation={this.state.collectionOperation}
-										collectionOperationTarget={this.state.collectionOperationTarget}
-										onCancelCollectionOperation={this.handleCancelCollectionOperation}
-										onSplitCollection={this.handleSplitCollection}
-										onMergeCollection={this.handleMergeCollection}
-										onSelectCollection={this.handleSelectCollection}
-										onLinkCollection={this.handleLinkCollection}
-										onUnlinkCollection={this.handleUnlinkCollection}
-										onCreateContact={this.handleCreateContact}
-										onEditContact={this.handleEditContact}
-										onDeleteContacts={this.handleDeleteContacts}
-									/>
-								</div>
-						}
-						<hr className="clear" />
-					</section>
+					<div className="manager">
+						<header>
+							<h1>Manager</h1>
+						</header>
+						<section>
+							<h1>{path}</h1>
+							{loading}
+							{form}
+							
+							{this.state.editingContact !== null
+								? <ContactEditor
+									contacts={this.state.contacts}
+									contact_id={this.state.editingContact}
+									onSubmitContact={this.handleSubmitContact}
+									onCancelEditContact={this.handleCancelEditContact} />
+								:
+									<div>
+										{this.state.orphan_areas
+											? <ManagerOrphanAreaList
+												orphans={this.state.orphan_areas}
+												onMoveChild={this.handleMoveChild}
+												onHideOrphans={this.handleHideOrphans} />
+											: <ManagerChildrenList
+												area_id={common.path2area(this.state.path)}
+												moving={this.state.moving}
+												children={this.state.children}
+												onAreaSelect={this.handleAreaSelect}
+												onRemoveChild={this.handleRemoveChild}
+												onMoveChild={this.handleMoveChild}
+												onDidBulkImport={this.handleDidBulkImport}
+												domain={domain}
+												onNewChild={this.handleNewChild}
+												onShowOrphans={this.handleViewOrphans} />
+										}
+										{this.state.moving.length ? <div>
+											<h2>Categories being moved: select to place</h2>
+											<ul className="shelve">{moving_shelve}</ul>
+										</div> : null}
+										<ManagerCollectionList
+											contacts={this.state.contacts}
+											collectionOperation={this.state.collectionOperation}
+											collectionOperationTarget={this.state.collectionOperationTarget}
+											onCancelCollectionOperation={this.handleCancelCollectionOperation}
+											onSplitCollection={this.handleSplitCollection}
+											onMergeCollection={this.handleMergeCollection}
+											onSelectCollection={this.handleSelectCollection}
+											onLinkCollection={this.handleLinkCollection}
+											onUnlinkCollection={this.handleUnlinkCollection}
+											onCreateContact={this.handleCreateContact}
+											onEditContact={this.handleEditContact}
+											onDeleteContacts={this.handleDeleteContacts}
+											onDeleteContact={this.handleDeleteContact}
+										/>
+									</div>
+							}
+						</section>
+					</div>
 				</div>
 			</div>
 		);

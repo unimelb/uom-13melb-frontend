@@ -13,16 +13,22 @@ var ManagerOrphanAreaList = React.createClass({
 			return (
 				<li>
 					{orphan.name}
-					<button onClick={function () { this.props.onMoveChild(orphan); }.bind(this)}>Move</button>
-					<button>Permanently Remove</button>
+					<span className="controls">
+						<a onClick={function () { this.props.onMoveChild(orphan); }.bind(this)}>
+							<svg className="icon" dangerouslySetInnerHTML={{__html: '<use xlink:href="#pen" />'}}></svg> Move
+						</a>
+						<a>
+							<svg className="icon" dangerouslySetInnerHTML={{__html: '<use xlink:href="#trash" />'}}></svg> Delete
+						</a>
+					</span>
 				</li>
 			);
 		}.bind(this));
 		return (
 			<div>
-				<button onClick={this.props.onHideOrphans}>View children</button>
-				<h3>Orphans</h3>
-				<ul>
+				<h1>Hidden categories</h1>
+				<p><a className="button-small soft" onClick={this.props.onHideOrphans}>View sub-categories</a></p>
+				<ul className="checklist no-check">
 					{orphan_dom}
 				</ul>
 			</div>
