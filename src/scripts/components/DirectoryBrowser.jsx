@@ -87,7 +87,7 @@ var DirectoryBrowser = React.createClass({
 				type: "GET",
 				data: {q : search_text},
 			}], function (data) {
-					data = data[0];
+				data = data[0];
 
 				// fetch contacts for all areas in results
 				if (this.lastSearchString == search_text) {
@@ -164,7 +164,7 @@ var DirectoryBrowser = React.createClass({
 		// fetch information on area
 		common.multi_ajax([
 			url_base + area_id + "/path",
-			url_base + area_id + "/descendents?depth=1",
+			url_base + area_id + "/descendents?depth=4",
 			url_base + area_id + "/descendent_contact_count"
 		], function (results) {
 
@@ -206,7 +206,6 @@ var DirectoryBrowser = React.createClass({
 							if ($("#search_box").val) $("#search_box").val("");
 							this.props.router.navigate("area/" + area_id);
 							new_state.contacts = info;
-							console.log(new_state.contacts);
 							this.setState(new_state);
 						}
 					}.bind(this)
@@ -234,7 +233,7 @@ var DirectoryBrowser = React.createClass({
 		}
 		if (selected_area != this.state.selected_area) {
 			$('html, body').animate({
-		    	scrollTop: $("#result-" + this.state.selected_area).offset().top
+		    	scrollTop: $("#result-" + this.state.selected_area).offset().top - 40
 		    }, 100);
 		}
 	},
@@ -291,7 +290,7 @@ var DirectoryBrowser = React.createClass({
 		return (
 			<div className="page-inner">
 				<div role="main" className="main">
-					<div className="result-section" id="result--1">
+					<header>
 						<SearchBox
 							onSearch={this.handleSearch}
 							onCloseToken={this.handleCloseToken}
@@ -299,11 +298,26 @@ var DirectoryBrowser = React.createClass({
 							area={this.state.area_id}
 							search_results={this.state.search_results}
 							tokens={this.state.tokens} />
+					</header>
+					
+					<div className="result-section" id="result--1">
+						<section>
+							<CurrentArea
+								path={this.state.current_path}
+								onAreaSelect={this.handleAreaSelect} />
+						</section>
 						<div className="results">
-							<CurrentArea path={this.state.current_path} />
 							{load_percentage}
 							{body}
-							<p><a data-no-scroll href={"#manage/" + common.path2area(this.state.current_path)}>Manage</a></p>
+							<p className="center">
+								<a data-no-scroll href="#" className="button-small soft" onClick={function (e) {
+									this.props.router.navigate("manage/" + common.path2area(this.state.current_path), {trigger: true});
+									e.stopPropagation();
+									return false;
+								}.bind(this)}>
+									Edit directory
+								</a>
+							</p>
 						</div>
 					</div>
 				</div>

@@ -16,11 +16,9 @@ module.exports = {
 		}
 		this.cache[key] = value;
 		this.cache_keys.push(key);
-		console.log(key + " added to cache");
 	},
 	get_cache : function (key) {
 		if (key in this.cache) {
-			console.log("cache hit for " + key);
 			return this.cache[key];
 		} else return false;
 	},
@@ -64,7 +62,7 @@ module.exports = {
 	},
 	loading : function (loading) {
 		return loading
-			? <p className="spinner"><img src="//s3.amazonaws.com/uom-13melb/spinner_32.gif" /></p>
+			? <p className="spinner"><img src="images/spinner.gif" /></p>
 			: <p className="spinner"></p>
 		;
 	}

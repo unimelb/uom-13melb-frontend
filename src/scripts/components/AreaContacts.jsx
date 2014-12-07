@@ -30,7 +30,9 @@ var AreaContacts = React.createClass({
 			var used_headings = [];
 
 			// generate a list of <td> for the contact's properties
-			var rows = contacts.contacts.map(function (contact) {
+			var rows = contacts.contacts.sort(function (ca, cb) {
+				return (ca.last_name || "") > (cb.last_name || "");
+			}).map(function (contact) {
 				var cells = {};
 
 				headings.forEach(function (heading) {
@@ -50,7 +52,6 @@ var AreaContacts = React.createClass({
 						cells["name"] = <td key="name">{name}</td>;
 						used_headings.push("name");
 					} else if (heading == "note" && !("first_name" in contact.contact_info || "last_name" in contact.contact_info)) {
-						console.log("setting name to note");
 						cells["name"] = <td key="name"><em>{contact.contact_info.note}</em></td>;
 						used_headings.push("name");
 					} else if (heading in contact.contact_info) {
@@ -91,6 +92,7 @@ var AreaContacts = React.createClass({
 				note_cell = <tr className="successor_note"><td colSpan={reduced_headings.length}>{note}</td></tr>;
 				class_name += " successor";
 			}
+			if (contacts.successors.length || note) class_name += " linked";
 			var table = data_rows.length
 				? <table className={class_name}><thead>{note_cell}{head_row}</thead><tbody>{data_rows}</tbody></table>
 				: null
@@ -121,20 +123,27 @@ var AreaContacts = React.createClass({
 			: this.props.contacts.map(render_contact_table);
 		;
 
-		var title;
+		var title = this.props.area.name;
 		if (this.props.onAreaSelect) {
 			var selectArea = function () {
 				this.props.onAreaSelect(this.props.area.area_id);
 				return false;
 			}.bind(this);
-			title = <a href="#" onClick={selectArea}>{this.props.area.name}</a>;
-		} else title = this.props.area.name;
+			title = <a href="#" onClick={selectArea}>{title}</a>;
+		}
+		if (this.props.path && this.props.path.length) {
+			title = [title, " (" + this.props.path.map(function (area) {
+				return area.name;
+			}).join(" / ") + ")"];
+		}
+
+		
 
 		// return the area's contacts/note if either exist, otherwise return `nothing'
 		if (notes || contacts || this.props.needsDivision) {
 		    return (
 				<div className="collection">
-					<h3>{title}</h3>
+					<h2>{title}</h2>
 					{notes}
 					{contacts}
 				</div>

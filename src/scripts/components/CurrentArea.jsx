@@ -13,13 +13,16 @@ var CurrentArea = React.createClass({
 		// generate path string
 		var pathstr = this.props.path.map(function (path, index) {
 			if (index == this.props.path.length - 1) return path.name;
-			else return <span><a href={"#area/" + (index ? path.area_id : "root")}>{path.name}</a> &rsaquo; </span>;
+			else return <span key={index}><a onClick={function () {
+				this.props.onAreaSelect(index ? path.area_id : "root");
+				return false;
+			}.bind(this)} href={"#"}>{path.name}</a> &rsaquo; </span>;
 		}.bind(this));
 
 		return (
-			<h2 className="current_area">
+			<h1 className="current_area">
 				{pathstr}
-			</h2>
+			</h1>
 		);
 	}
 });

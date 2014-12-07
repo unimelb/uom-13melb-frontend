@@ -37,3 +37,5 @@ env_vars
 .editorconfig
 .jshintrc
 npm-debug.log
+
+*.zip

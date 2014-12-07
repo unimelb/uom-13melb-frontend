@@ -65,10 +65,10 @@ var Contacts = React.createClass({
 
 			$(this).on("click", function () {
 				if ($(this).html() == less_text) {
-					box.select("li").css({"display" : "none"});
+					box.find("li").css({"display" : ""});
 					$(this).html("more...");
 				} else {
-					box.select("li").css({"display" : "block"});
+					box.find("li").css({"display" : "block"});
 					$(this).html(less_text);
 				}
 				return false;
@@ -99,10 +99,8 @@ var Contacts = React.createClass({
 					search_string={this.props.search_string}
 					onAreaSelect={index == this.props.path.length - 1 ? false : this.props.onAreaSelect} />;
 			}.bind(this));
-			//console.log(this.props.path);
 
 			if (this.props.showDescendents && this.props.area_info.descendent_contact_count > cutoff) {
-				//console.log('too many descendents');
 				// too many descendents, show tree
 				var explore = function (tree, depth) {
 					var sub_list = null;
@@ -111,7 +109,7 @@ var Contacts = React.createClass({
 							sub_list = <ul>{tree.children.map(function (child) {
 								return explore(child, depth - 1);
 							})}</ul>;
-						} else sub_list = <ul><li>...</li></ul>;
+						}// else sub_list = <ul><li>...</li></ul>;
 					}
 					var load_area = function () {
 						this.selectArea(tree.area.area_id);
@@ -131,10 +129,10 @@ var Contacts = React.createClass({
 						return false;
 					}.bind(this);
 					var child_lis = child.children.map(function (area) {
-						return explore(area, 3);
+						return explore(area, 0);
 					});
 					if (child_lis.length > 7) {
-						child_lis.push(<li><a className="show-more" href="#">more...</a></li>);
+						child_lis.push(<li key={0}><a className="show-more" href="#">more...</a></li>);
 					}
 					var subchildren = child.children.length
 						? <ul>{child_lis}</ul>
@@ -174,17 +172,16 @@ var Contacts = React.createClass({
 			 * Show individual contact display.
 			 */
 			} else {
-				//console.log("at Contacts: " + this.props.showDescendents);
-				var subcontact_display = function (children) {
+				var subcontact_display = function (children, path) {
 					return children.map(function (child) {
-						console.log("inside loop: " + this.props.showDescendents);
 						var area_contacts = <AreaContacts
 							area={child.area}
+							path={path}
 							showDescendents={this.props.showDescendents}
 							contacts={this.props.contact_info[child.area.area_id]}
 							needsDivision={children.length > 1}
 							onAreaSelect={this.props.onAreaSelect} />;
-						var subcontacts = subcontact_display(child.children);
+						var subcontacts = subcontact_display(child.children, path.concat(child.area));
 						return (
 							<div key={child.area.area_id} className="child_area">
 								{area_contacts}
@@ -200,7 +197,7 @@ var Contacts = React.createClass({
 						: 0
 				);
 				var descendent_contacts = this.props.showDescendents && num_descendents
-					? <div><hr />{subcontact_display(this.props.area_info.descendents.children)}</div>
+					? <div>{subcontact_display(this.props.area_info.descendents.children, [])}</div>
 					: num_descendents
 						? <p className="descendent_notice">{"Has " + num_descendents + " un-shown descendent contacts; select to view."}</p>
 						: null

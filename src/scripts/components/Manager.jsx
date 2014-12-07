@@ -13,7 +13,7 @@ var ManagerChildrenList = require("./ManagerChildrenList.jsx");
 var ManagerOrphanAreaList = require("./ManagerOrphanAreaList.jsx");
 var ManagerCollectionList = require("./ManagerCollectionList.jsx");
 var ContactEditor = require("./ContactEditor.jsx");
-
+var ContactChooser = require("./ContactChooser.jsx");
 var domain = config.base_url.replace(/\/area\//g, "/");
 var collection_url = domain + "collection/";
 var area_url = domain + "area/";
@@ -32,7 +32,9 @@ var Manager = React.createClass({
 			collectionOperationTarget : 0,
 			editingContact : null,
 			newContactCollection : 0,
-			orphan_areas : null
+			orphan_areas : null,
+			searchingForContacts : false,
+			foundContacts : []
 		};
 	},
 	getCurrentArea : function () {
@@ -278,6 +280,19 @@ var Manager = React.createClass({
 	handleLinkExistingContact : function () {
 
 	},
+	handleSearchForContact : function (text) {
+		$.ajax({
+			url: contact_url + "?q=" + text,
+			success: function (results) {
+				this.setState({
+					foundContacts: results
+				});
+			}.bind(this)
+		});
+	},
+	handleBeginSearchingForContact : function () {
+		this.setState({searchingForContacts: true});
+	},
 	handleSubmitContact : function (contact_info) {
 		console.log("submit contact");
 		if (this.state.editingContact === 0) {
@@ -395,60 +410,64 @@ var Manager = React.createClass({
 		return (
 			<div className="page-inner">
 				<div role="main" className="main">
+					<header>
+						<h1>Manage Contacts</h1>
+					</header>
 					<div className="manager">
-						<header>
-							<h1>Manager</h1>
-						</header>
 						<section>
 							<h1>{path}</h1>
 							{loading}
 							{form}
-							
-							{this.state.editingContact !== null
-								? <ContactEditor
-									contacts={this.state.contacts}
-									contact_id={this.state.editingContact}
-									onSubmitContact={this.handleSubmitContact}
-									onCancelEditContact={this.handleCancelEditContact} />
-								:
-									<div>
-										{this.state.orphan_areas
-											? <ManagerOrphanAreaList
-												orphans={this.state.orphan_areas}
-												onMoveChild={this.handleMoveChild}
-												onHideOrphans={this.handleHideOrphans} />
-											: <ManagerChildrenList
-												area_id={common.path2area(this.state.path)}
-												moving={this.state.moving}
-												children={this.state.children}
-												onAreaSelect={this.handleAreaSelect}
-												onRemoveChild={this.handleRemoveChild}
-												onMoveChild={this.handleMoveChild}
-												onDidBulkImport={this.handleDidBulkImport}
-												domain={domain}
-												onNewChild={this.handleNewChild}
-												onShowOrphans={this.handleViewOrphans} />
-										}
-										{this.state.moving.length ? <div>
-											<h2>Categories being moved: select to place</h2>
-											<ul className="shelve">{moving_shelve}</ul>
-										</div> : null}
-										<ManagerCollectionList
-											contacts={this.state.contacts}
-											collectionOperation={this.state.collectionOperation}
-											collectionOperationTarget={this.state.collectionOperationTarget}
-											onCancelCollectionOperation={this.handleCancelCollectionOperation}
-											onSplitCollection={this.handleSplitCollection}
-											onMergeCollection={this.handleMergeCollection}
-											onSelectCollection={this.handleSelectCollection}
-											onLinkCollection={this.handleLinkCollection}
-											onUnlinkCollection={this.handleUnlinkCollection}
-											onCreateContact={this.handleCreateContact}
-											onEditContact={this.handleEditContact}
-											onDeleteContacts={this.handleDeleteContacts}
-											onDeleteContact={this.handleDeleteContact}
-										/>
-									</div>
+							{this.state.searchingForContacts
+								? <ContactChooser
+									onSearchForContact={this.handleSearchForContact}
+									foundContacts={this.state.foundContacts} />
+								: this.state.editingContact !== null
+									? <ContactEditor
+										contacts={this.state.contacts}
+										contact_id={this.state.editingContact}
+										onSubmitContact={this.handleSubmitContact}
+										onCancelEditContact={this.handleCancelEditContact} />
+									:
+										<div>
+											{this.state.orphan_areas
+												? <ManagerOrphanAreaList
+													orphans={this.state.orphan_areas}
+													onMoveChild={this.handleMoveChild}
+													onHideOrphans={this.handleHideOrphans} />
+												: <ManagerChildrenList
+													area_id={common.path2area(this.state.path)}
+													moving={this.state.moving}
+													children={this.state.children}
+													onAreaSelect={this.handleAreaSelect}
+													onRemoveChild={this.handleRemoveChild}
+													onMoveChild={this.handleMoveChild}
+													onDidBulkImport={this.handleDidBulkImport}
+													domain={domain}
+													onNewChild={this.handleNewChild}
+													onShowOrphans={this.handleViewOrphans} />
+											}
+											{this.state.moving.length ? <div>
+												<h2>Categories being moved: select to place</h2>
+												<ul className="shelve">{moving_shelve}</ul>
+											</div> : null}
+											<ManagerCollectionList
+												contacts={this.state.contacts}
+												collectionOperation={this.state.collectionOperation}
+												collectionOperationTarget={this.state.collectionOperationTarget}
+												onCancelCollectionOperation={this.handleCancelCollectionOperation}
+												onSplitCollection={this.handleSplitCollection}
+												onMergeCollection={this.handleMergeCollection}
+												onSelectCollection={this.handleSelectCollection}
+												onLinkCollection={this.handleLinkCollection}
+												onUnlinkCollection={this.handleUnlinkCollection}
+												onCreateContact={this.handleCreateContact}
+												onLinkContact={this.handleBeginSearchingForContact}
+												onEditContact={this.handleEditContact}
+												onDeleteContacts={this.handleDeleteContacts}
+												onDeleteContact={this.handleDeleteContact}
+											/>
+										</div>
 							}
 						</section>
 					</div>

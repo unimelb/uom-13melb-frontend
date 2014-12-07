@@ -6,6 +6,7 @@
 
 var React = require('react/addons');
 var util  = require("util");
+var common = require("../common.jsx");
 require('../../styles/SearchBox.css');
 
 var autoCompleteTimeout;
@@ -83,17 +84,15 @@ var SearchBox = React.createClass({
     			{label}
     		</li>;
     	}.bind(this));
-    	var loading = this.props.isLoading
-    		? <p className="spinner"><img src="//s3.amazonaws.com/uom-13melb/spinner_32.gif" /></p>
-    		: null;
+    	var loading = common.loading(this.props.isLoading);
     	//loading = null;
-        return (
-            <form className="search_form" onSubmit={this.handleSubmit}>
+        return (<div>
+            <ul id="search_tokens" ref="search_tokens">
+              {tokens}
+            </ul>
+            <form className="search" onSubmit={this.handleSubmit}>
               <fieldset>
               	<div className="search_box inline" onClick={this.handleFauxBoxClick}>
-              		<ul id="search_tokens" ref="search_tokens">
-              			{tokens}
-              		</ul>
                 	<input
                 		type="search" ref="search"
                 		placeholder="enter your search term"
@@ -107,7 +106,7 @@ var SearchBox = React.createClass({
               <div ref="search_shadow" className="search_shadow"></div>
               {loading}
             </form>
-        );
+        </div>);
     }
 });
 
