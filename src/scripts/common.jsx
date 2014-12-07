@@ -62,7 +62,7 @@ module.exports = {
 	},
 	loading : function (loading) {
 		return loading
-			? <p className="spinner"><img src="images/spinner.gif" /></p>
+			? <p className="spinner"><img src="http://d3slkwbhoow66.cloudfront.net/spinner.gif" /></p>
 			: <p className="spinner"></p>
 		;
 	}
