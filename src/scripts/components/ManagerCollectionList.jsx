@@ -5,7 +5,6 @@
 'use strict';
 
 var React = require('react/addons');
-require('../../styles/ManagerCollectionList.css');
 
 var ManagerCollectionList = React.createClass({
 	get_checked : function (collection_id) {

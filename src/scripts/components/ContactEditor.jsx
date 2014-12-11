@@ -5,7 +5,6 @@
 'use strict';
 
 var React = require('react/addons');
-require('../../styles/ContactEditor.css');
 
 var dfs = function (all_contacts, contact_id) {
 	if (!all_contacts.length) return null;

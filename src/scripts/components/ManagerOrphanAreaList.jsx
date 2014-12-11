@@ -5,7 +5,6 @@
 'use strict';
 
 var React = require('react/addons');
-require('../../styles/ManagerOrphanAreaList.css');
 
 var ManagerOrphanAreaList = React.createClass({
 	render: function () {

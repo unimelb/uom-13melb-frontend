@@ -5,7 +5,6 @@
 'use strict';
 
 var React = require('react/addons');
-require('../../styles/ManagerChildrenList.css');
 
 var ManagerChildrenList = React.createClass({
 	componentDidUpdate : function () {

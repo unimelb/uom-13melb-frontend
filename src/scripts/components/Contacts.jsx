@@ -5,7 +5,6 @@
 'use strict';
 
 var React = require('react/addons');
-require('../../styles/Contacts.css');
 
 var AreaContacts = require("./AreaContacts.jsx");
 

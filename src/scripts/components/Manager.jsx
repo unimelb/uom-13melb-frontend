@@ -5,7 +5,6 @@
 'use strict';
 
 var React = require('react/addons');
-require('../../styles/Manager.css');
 var config = require("../config.js");
 var common = require("../common.jsx");
 
@@ -526,6 +525,15 @@ var Manager = React.createClass({
 										</div>
 							}
 						</section>
+						<p className="center">
+							<a data-no-scroll href="#" className="button-small soft" onClick={function (e) {
+								this.props.router.navigate("area/" + common.path2area(this.state.path), {trigger: true});
+								e.stopPropagation();
+								return false;
+							}.bind(this)}>
+								Return to browsing
+							</a>
+						</p>
 					</div>
 				</div>
 			</div>

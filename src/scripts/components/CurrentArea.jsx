@@ -5,7 +5,6 @@
 'use strict';
 
 var React = require('react/addons');
-require('../../styles/CurrentArea.css');
 
 var CurrentArea = React.createClass({
 	render: function () {

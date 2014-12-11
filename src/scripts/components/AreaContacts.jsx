@@ -5,7 +5,6 @@
 'use strict';
 
 var React = require('react/addons');
-require('../../styles/AreaContacts.css');
 
 var AreaContacts = React.createClass({
 	render: function () {

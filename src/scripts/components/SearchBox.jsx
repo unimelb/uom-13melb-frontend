@@ -7,7 +7,6 @@
 var React = require('react/addons');
 var util  = require("util");
 var common = require("../common.jsx");
-require('../../styles/SearchBox.css');
 
 var autoCompleteTimeout;
 
