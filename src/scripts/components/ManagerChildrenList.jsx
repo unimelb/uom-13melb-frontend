@@ -45,8 +45,13 @@ var ManagerChildrenList = React.createClass({
 
 		return (
 			<div>
-				<h1 id="manager-children">Sub-categories</h1>
 				<p>
+					{this.props.parent
+						? <span><a className="button-small cta" onClick={function () {
+							this.props.onAreaSelect(this.props.parent);
+						}.bind(this)}>Go up</a>&nbsp;</span>
+						: null
+					}
 					<a className="button-small float-right" onClick={this.props.onNewChild}>New sub-category</a>&nbsp;
 					<a className="button-small soft" onClick={this.props.onShowOrphans}>View hidden categories</a>
 				</p>

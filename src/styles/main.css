@@ -189,6 +189,10 @@ section.path h1 {
 	font-size:20pt;
 }
 
+.uomcontent [role="main"] section h1.path {
+	font-size:20pt;
+}
+
 .uomcontent [role="main"] section.navigation-block-listing {
 	max-width:100%;
 	padding:0px;

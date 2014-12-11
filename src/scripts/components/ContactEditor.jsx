@@ -54,7 +54,7 @@ var ContactEditor = React.createClass({
 					<label key={key}>{label}
 						<input
 							type="text" ref={key} name={key}
-							value={this.state.form_values[key] || contact_info[key]}
+							value={this.state.form_values[key] !== undefined ? this.state.form_values[key] : contact_info[key]}
 							onChange={this.handleFormEntry} />
 					</label>
 				</div>

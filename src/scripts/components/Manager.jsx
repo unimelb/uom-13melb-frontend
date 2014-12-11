@@ -461,9 +461,8 @@ var Manager = React.createClass({
 					</header>
 					<div className="manager">
 						<section>
-							<h1 className={path}>{path}</h1>
+							<h1 className="path" id="manager-children">{path}</h1>
 							{loading}
-							{form}
 							{this.state.searchingForContacts !== false
 								? <ContactChooser
 									onSearchForContact={this.handleSearchForContact}
@@ -492,6 +491,7 @@ var Manager = React.createClass({
 													onHideOrphans={this.handleHideOrphans} />
 												: <ManagerChildrenList
 													area_id={common.path2area(this.state.path)}
+													parent={this.state.path.length > 1 ? this.state.path[this.state.path.length - 2].area_id : null}
 													moving={this.state.moving}
 													children={this.state.children}
 													onAreaSelect={this.handleAreaSelect}
@@ -524,6 +524,8 @@ var Manager = React.createClass({
 											/>
 										</div>
 							}
+							<h1>Update area details</h1>
+							{form}
 						</section>
 						<p className="center">
 							<a data-no-scroll href="#" className="button-small soft" onClick={function (e) {
