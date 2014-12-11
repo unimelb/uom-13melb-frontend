@@ -131,7 +131,7 @@ var ManagerCollectionList = React.createClass({
 
 		return (
 			<div className="manager_lists">
-				<h1>Contacts</h1>
+				<h1 id="manager-collections">Contacts</h1>
 				<div>{collection_html}</div>
 			</div>
 		);

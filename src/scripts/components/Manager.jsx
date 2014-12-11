@@ -34,7 +34,8 @@ var Manager = React.createClass({
 			newContactCollection : 0,
 			orphan_areas : null,
 			searchingForContacts : false,
-			foundContacts : []
+			foundContacts : [],
+			position: ''
 		};
 	},
 	getCurrentArea : function () {
@@ -47,9 +48,11 @@ var Manager = React.createClass({
 		this.handleAreaSelect(new_props.area);
 	},
 	componentDidUpdate: function () {
-		if (this.state.searchingForContacts !== false) {
+		if (this.state.position != '') {
+			var position = this.state.position;
+			this.setState({position: ''});
 			$('html, body').animate({
-	    	scrollTop: $("#existing-search-anchor").offset().top - 40
+	    	scrollTop: $(position).offset().top - 40
 	    }, 100);
 	  }
 	},
@@ -96,7 +99,8 @@ var Manager = React.createClass({
 					name : area.name,
 					note : area.note
 				},
-				loading : false
+				loading : false,
+				position: "#manager-children"
 			});
 		}.bind(this));
 		return false;
@@ -293,7 +297,10 @@ var Manager = React.createClass({
 					contact_id: contact_id
 				},
 				success: function () {
-					this.setState({searchingForContacts: false});
+					this.setState({
+						searchingForContacts: false,
+						position: "#manager-collections"
+					});
 					this.refresh_contacts();
 				}.bind(this)
 			})
@@ -321,10 +328,16 @@ var Manager = React.createClass({
 		});
 	},
 	handleCancelLinkExistingContact: function () {
-		this.setState({searchingForContacts: false});
+		this.setState({
+			searchingForContacts: false,
+			position: "#manager-collections"
+		});
 	},
 	handleBeginSearchingForContact : function (collection_id) {
-		this.setState({searchingForContacts: collection_id});
+		this.setState({
+			searchingForContacts: collection_id,
+			position: "#existing-search-anchor"
+		});
 	},
 	handleSubmitContact : function (contact_info) {
 		console.log("submit contact");
@@ -374,7 +387,8 @@ var Manager = React.createClass({
 	},
 	handleCancelEditContact : function () {
 		this.setState({
-			editingContact : null
+			editingContact : null,
+			position: "#manager-collections"
 		});
 	},
 	handleDidBulkImport : function (response) {
