@@ -84,7 +84,9 @@ var ManagerCollectionList = React.createClass({
 								<a className="button-small" onClick={function () {
 									this.props.onCreateContact(collection_id);
 								}.bind(this)}>New contact</a>&nbsp;
-								<a className="button-small" onClick={this.props.onLinkContact}>Add existing contact</a>&nbsp;
+								<a className="button-small" onClick={function () {
+									this.props.onLinkContact(collection_id)
+								}.bind(this)}>Add existing contact</a>&nbsp;
 								<a onClick={function () {
 									this.props.onMergeCollection(collection_id)
 								}.bind(this)} className="button-small soft">Merge</a>&nbsp;
@@ -118,28 +120,14 @@ var ManagerCollectionList = React.createClass({
 			return contacts;
 		}.bind(this);
 
-		/*collection_recurse = function(collection, i) {
-			var cid = collection.collection_id;
-			//console.log(cid[i]);
-			return (
-				<div key={cid}>
-					Collection
-				</div>
-			);
-		}*/
-
-		console.log(this.props.contacts);
-
 		var collection_html = this.props.contacts.length
 			? this.props.contacts.map(collection_recurse)
 			: <p><a className="button-small" onClick={function () {
 				this.props.onCreateContact(null);
-			}.bind(this)}>New contact</a> <a className="button-small" onClick={this.props.onLinkContact}>Link existing</a></p>
+			}.bind(this)}>New contact</a> <a className="button-small" onClick={function () {
+				this.props.onLinkContact(null)
+			}.bind(this)}>Link existing</a></p>
 		;
-
-		console.log(collection_html);
-
-		
 
 		return (
 			<div className="manager_lists">

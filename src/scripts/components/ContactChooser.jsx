@@ -23,13 +23,23 @@ var ContactChooser = React.createClass({
 		}.bind(this), 200);
 	},
 	render: function () {
+		var present = this.props.contacts.map(function (contact) {
+			return contact.contact_id;
+		});
 		var contacts = this.props.foundContacts.map(function (contact, index) {
-			return (
-				<p>{(contact.first_name + " " + contact.last_name) || contact.note}</p>
-			);
-		})
+			if (present.indexOf(contact.contact_id) == -1) {
+				return (
+					<li><a onClick={function () {
+						this.props.onLinkExistingContact(contact.contact_id);
+					}.bind(this)}>{(contact.first_name + " " + contact.last_name) || contact.note}</a></li>
+				);
+			} else {
+				return null;
+			}
+		}.bind(this));
 		return (
 			<div className="contact-chooser">
+				<h1 id="existing-search-anchor">Search for existing contact</h1>
 				<form>
 					<fieldset>
 						<div className="inline">
@@ -40,9 +50,12 @@ var ContactChooser = React.createClass({
 						</div>
 					</fieldset>
 				</form>
-				<div ref="contact-list" className="contact-list">
+				<ul ref="contact-list" className="contact-list">
 					{contacts}
-				</div>
+				</ul>
+				<p>
+					<button className="button-small warning" onClick={this.props.onCancelLinkExistingContact}>Cancel</button>
+				</p>
 			</div>
 		);
 	}

@@ -20,7 +20,7 @@ var CurrentArea = React.createClass({
 		}.bind(this));
 
 		return (
-			<h1 className="current_area">
+			<h1 className="current_area path">
 				{pathstr}
 			</h1>
 		);

@@ -301,7 +301,7 @@ var DirectoryBrowser = React.createClass({
 					</header>
 					
 					<div className="result-section" id="result--1">
-						<section>
+						<section className="path">
 							<CurrentArea
 								path={this.state.current_path}
 								onAreaSelect={this.handleAreaSelect} />

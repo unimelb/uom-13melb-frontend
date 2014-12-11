@@ -46,6 +46,13 @@ var Manager = React.createClass({
 	componentWillReceiveProps : function (new_props) {
 		this.handleAreaSelect(new_props.area);
 	},
+	componentDidUpdate: function () {
+		if (this.state.searchingForContacts !== false) {
+			$('html, body').animate({
+	    	scrollTop: $("#existing-search-anchor").offset().top - 40
+	    }, 100);
+	  }
+	},
 	refresh_children : function () {
 		$.ajax({
 			url : config.base_url + common.path2area(this.state.path) + "/children",
@@ -277,8 +284,31 @@ var Manager = React.createClass({
 			editingContact : contact_id
 		});
 	},
-	handleLinkExistingContact : function () {
-
+	handleLinkExistingContact : function (contact_id) {
+		var link_contact = function (collection_id) {
+			$.ajax({
+				url: collection_url + collection_id + "/contacts",
+				type: "POST",
+				data : {
+					contact_id: contact_id
+				},
+				success: function () {
+					this.setState({searchingForContacts: false});
+					this.refresh_contacts();
+				}.bind(this)
+			})
+		}.bind(this);
+		if (this.state.searchingForContacts === null) {
+			$.ajax({
+				url : area_url + common.path2area(this.state.path) + "/collections",
+				type : "POST",
+				success : function (data) {
+					link_contact(data.collection_id);
+				}.bind(this)
+			});
+		} else {
+			link_contact(this.state.searchingForContacts);
+		}
 	},
 	handleSearchForContact : function (text) {
 		$.ajax({
@@ -290,8 +320,11 @@ var Manager = React.createClass({
 			}.bind(this)
 		});
 	},
-	handleBeginSearchingForContact : function () {
-		this.setState({searchingForContacts: true});
+	handleCancelLinkExistingContact: function () {
+		this.setState({searchingForContacts: false});
+	},
+	handleBeginSearchingForContact : function (collection_id) {
+		this.setState({searchingForContacts: collection_id});
 	},
 	handleSubmitContact : function (contact_info) {
 		console.log("submit contact");
@@ -415,12 +448,21 @@ var Manager = React.createClass({
 					</header>
 					<div className="manager">
 						<section>
-							<h1>{path}</h1>
+							<h1 className={path}>{path}</h1>
 							{loading}
 							{form}
-							{this.state.searchingForContacts
+							{this.state.searchingForContacts !== false
 								? <ContactChooser
 									onSearchForContact={this.handleSearchForContact}
+									onLinkExistingContact={this.handleLinkExistingContact}
+									onCancelLinkExistingContact={this.handleCancelLinkExistingContact}
+									contacts={
+										this.state.searchingForContacts
+											? this.state.contacts.filter(function (coll) {
+													return coll.collection_id == this.state.searchingForContacts
+											}.bind(this))[0].contacts
+											: []
+									}
 									foundContacts={this.state.foundContacts} />
 								: this.state.editingContact !== null
 									? <ContactEditor

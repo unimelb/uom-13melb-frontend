@@ -1,3 +1,7 @@
+a {
+	cursor: pointer;
+}
+
 form.search_form ul#search_tokens {
 	height:0px;
 	padding:0px;
@@ -177,6 +181,17 @@ tr.successor_note {
 	padding:0px;
 	margin-bottom:-32px;
 	text-align:center;
+}
+
+section.path h1 {
+	width:80%;
+	max-width:80%;
+	font-size:20pt;
+}
+
+.uomcontent [role="main"] section.navigation-block-listing {
+	max-width:100%;
+	padding:0px;
 }
 
 /*
