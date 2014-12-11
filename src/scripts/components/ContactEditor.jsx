@@ -69,7 +69,8 @@ var ContactEditor = React.createClass({
 					</fieldset>
 					<footer>
 						<input type="submit" onClick={function () {
-							this.props.onSubmitContact(this.state.form_values)
+							this.props.onSubmitContact(this.state.form_values);
+							return false;
 						}.bind(this)} value="Update" />&nbsp;
 						<a className="button soft" onClick={this.props.onCancelEditContact}>Cancel</a>
 					</footer>
