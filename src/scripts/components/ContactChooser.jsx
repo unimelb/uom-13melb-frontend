@@ -31,7 +31,7 @@ var ContactChooser = React.createClass({
 				return (
 					<li><a onClick={function () {
 						this.props.onLinkExistingContact(contact.contact_id);
-					}.bind(this)}>{(contact.first_name + " " + contact.last_name) || contact.note}</a></li>
+					}.bind(this)}>{(contact.first_name + " " + contact.last_name + " (" + (contact.position || contact.phone || contact.email || '') + ")") || contact.note}</a></li>
 				);
 			} else {
 				return null;
