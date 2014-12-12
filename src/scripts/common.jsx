@@ -22,6 +22,9 @@ module.exports = {
 			return this.cache[key];
 		} else return false;
 	},
+	clear_cache: function () {
+		this.cache = {}
+	},
 	multi_ajax : function(calls, callback) {
 		var count = calls.length;
 		if (!count) callback([]);

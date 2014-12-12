@@ -64,6 +64,7 @@ var Manager = React.createClass({
 		$(form).on("submit", function () {
 			$(form).find("input[type=submit]").attr("disabled", "disabled");
 		});
+		common.clear_cache();
 	},
 	refresh_children : function () {
 		$.ajax({
