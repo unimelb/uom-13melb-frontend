@@ -478,11 +478,11 @@ var Manager = React.createClass({
 				<div role="main" className="main">
 					<header>
 						<h1>Manage Contacts</h1>
+						{loading}
 					</header>
 					<div className="manager">
 						<section>
 							<h1 className="path" id="manager-children">{path}</h1>
-							{loading}
 							{this.state.searchingForContacts !== false
 								? <ContactChooser
 									onSearchForContact={this.handleSearchForContact}

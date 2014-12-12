@@ -188,6 +188,7 @@ tr.successor_note {
 	padding:0px;
 	margin-bottom:-32px;
 	text-align:center;
+	max-width:none;
 }
 
 section.path h1 {
