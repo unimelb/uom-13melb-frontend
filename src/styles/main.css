@@ -143,18 +143,25 @@ hr {
 	margin-bottom:1.5rem;
 }
 
-.succeeds:before {
+/*.succeeds:before {
 	height:1.5rem;
 	margin-left:20px;
 	content:' ';
-	width:3px;
+	width:2px;
 	display:block;
 	background-color:#CCC;
 	margin-bottom:-1.5rem;
 	margin-top:-1.5rem;
-}
+}*/
+
 table.contact_table.linked {
-	border:3px solid #CCC;
+	border:2px solid #CCC;
+}
+table.contact_table.successor {
+	margin-top:0px;
+}
+table.contact_table.primary {
+	border:2px solid #0c304a;
 }
 tr.successor_note {
 	border-bottom:3px solid #CCC;
@@ -196,6 +203,29 @@ section.path h1 {
 .uomcontent [role="main"] section.navigation-block-listing {
 	max-width:100%;
 	padding:0px;
+}
+
+.uomcontent .collection-controls a {
+	margin-right:10px;
+}
+
+[role="main"] form.upload-form {
+	padding-bottom:100px;
+}
+
+.manager-lists .collection-manager.linked, .manager-lists .collection-successors .collection-manager {
+	border:2px solid #CCC;
+	padding:0px 10px;
+}
+
+.uomcontent [role="main"] section .manager-lists .successor, .uomcontent [role="main"] .successor-note {
+  border-left: 2px solid #CCC;
+  padding: 10px;
+  margin-left: 20px;
+}
+
+.uomcontent [role="main"] .successor-note {
+	margin-top:-1.5rem;
 }
 
 /*

@@ -54,6 +54,16 @@ var Manager = React.createClass({
 	    	scrollTop: $(position).offset().top - 40
 	    }, 100);
 	  }
+	  var form = this.refs.bulk_import.getDOMNode();
+		$(form).ajaxForm(function (data) {
+			this.props.onDidBulkImport(data);
+			setTimeout(function () {
+				$(form).find("input[type=submit]").removeAttr("disabled");
+			}, 1000);
+		}.bind(this));
+		$(form).on("submit", function () {
+			$(form).find("input[type=submit]").attr("disabled", "disabled");
+		});
 	},
 	refresh_children : function () {
 		$.ajax({
@@ -409,6 +419,15 @@ var Manager = React.createClass({
 	handleHideOrphans : function () {
 		this.setState({orphan_areas : null});
 	},
+	handleTogglePrimary: function (collection_id) {
+		$.ajax({
+			url: collection_url + collection_id + "/primary",
+			type: "POST",
+			success: function () {
+				this.refresh_contacts();
+			}.bind(this)
+		})
+	},
 	render: function () {
 		
 		var path = this.state.path.map(function (segment, index) {
@@ -521,11 +540,19 @@ var Manager = React.createClass({
 												onEditContact={this.handleEditContact}
 												onDeleteContacts={this.handleDeleteContacts}
 												onDeleteContact={this.handleDeleteContact}
+												onTogglePrimary={this.handleTogglePrimary}
 											/>
 										</div>
 							}
 							<h1>Update area details</h1>
 							{form}
+							<h2>Bulk import sub-categories</h2>
+							<form encType="multipart/form-data" className="upload-form" ref="bulk_import" action={domain + "area/" + common.path2area(this.state.path) + "/upload"} method="post">
+								<fieldset>
+									<input type="file" name="datafile" />
+									<input type="submit" value="Bulk import" />
+								</fieldset>
+							</form>
 						</section>
 						<p className="center">
 							<a data-no-scroll href="#" className="button-small soft" onClick={function (e) {

@@ -30,7 +30,9 @@ var AreaContacts = React.createClass({
 
 			// generate a list of <td> for the contact's properties
 			var rows = contacts.contacts.sort(function (ca, cb) {
-				return (ca.last_name || "") > (cb.last_name || "");
+				if ((ca.contact_info.last_name || "") > (cb.contact_info.last_name || "")) return 1;
+				if ((ca.contact_info.last_name || "") < (cb.contact_info.last_name || "")) return -1;
+				else return 0;
 			}).map(function (contact) {
 				var cells = {};
 
@@ -88,12 +90,13 @@ var AreaContacts = React.createClass({
 			var class_name = "contact_table" + (this.props.showDescendents ? " full" : " reduced");
 			var note_cell = null;
 			if (note) {
-				note_cell = <tr className="successor_note"><td colSpan={reduced_headings.length}>{note}</td></tr>;
+				note_cell = <div className="successor-note">{note}</div>;
 				class_name += " successor";
 			}
 			if (contacts.successors.length || note) class_name += " linked";
+			if (contacts.primary) class_name += " primary";
 			var table = data_rows.length
-				? <table className={class_name}><thead>{note_cell}{head_row}</thead><tbody>{data_rows}</tbody></table>
+				? [note_cell, <table className={class_name}><thead>{head_row}</thead><tbody>{data_rows}</tbody></table>]
 				: null
 			;
 
@@ -119,7 +122,15 @@ var AreaContacts = React.createClass({
 		// actually call the render function on the contacts (if they exist)
 		var contacts = !this.props.contacts || this.props.contacts.length == 0
 			? null
-			: this.props.contacts.map(render_contact_table);
+			: this.props.contacts.sort(function (a, b) {
+					if (a.primary && !b.primary) return -1;
+					else if (b.primary && !a.primary) return 1;
+					else {
+						if (a.collection_id < b.collection_id) return -1;
+						else if (a.collection_id > b.collection_id) return 1;
+						else return 0;
+					};
+				}).map(render_contact_table);
 		;
 
 		var title = this.props.area.name;

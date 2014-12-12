@@ -25,7 +25,7 @@ var ManagerCollectionList = React.createClass({
 	},
 	render: function () {
 		console.log("render called");
-		var collection_recurse = function (collection, i) {
+		var collection_recurse = function (collection, i, is_successor) {
 			var collection_id = collection.collection_id;
 			var faded = false;
 			if (this.props.collectionOperation && this.props.collectionOperationTarget == collection_id) {
@@ -74,27 +74,30 @@ var ManagerCollectionList = React.createClass({
 			;
 
 			contacts = <div key={collection_id * 3} className={faded ? "" : ""}>{[
-				<div key={collection_id * 3 + 2} className="collection_manager">
+				<div key={collection_id * 3 + 2} className={"collection-manager" + (collection.successors.length ? " linked" : "")}>
 					<h2>Contact group</h2>
 					{
 						select_collection
 							? (faded ? cancel : select_collection)
-							: <span>
+							: <span className="collection-controls">
 								<a className="button-small" onClick={function () {
 									this.props.onCreateContact(collection_id);
 								}.bind(this)}>New contact</a>&nbsp;
-								<a className="button-small" onClick={function () {
+								<a className="" onClick={function () {
 									this.props.onLinkContact(collection_id)
-								}.bind(this)}>Add existing contact</a>&nbsp;
+								}.bind(this)}>Add existing</a>&nbsp;
 								<a onClick={function () {
 									this.props.onMergeCollection(collection_id)
-								}.bind(this)} className="button-small soft">Merge</a>&nbsp;
-								<a onClick={function () {
+								}.bind(this)} className="">Merge</a>&nbsp;
+								{is_successor !== true ? <span><a onClick={function () {
 									this.props.onLinkCollection(collection_id)
-								}.bind(this)} className="button-small soft">Link</a>&nbsp;
+								}.bind(this)} className="">Link</a>&nbsp;</span> : null}
 								<a onClick={function () {
 									this.handleSplitCollection(collection_id)
-								}.bind(this)} className="button-small soft">Split selected</a>
+								}.bind(this)} className="">Split selected</a>&nbsp;
+								<a onClick={function () {
+									this.props.onTogglePrimary(collection_id)
+								}.bind(this)} className="">{collection.primary ? "Unset primary" : "Set primary"}</a>
 							</span>
 					}
 					<form>
@@ -103,16 +106,16 @@ var ManagerCollectionList = React.createClass({
 						</fieldset>
 					</form>
 				</div>
-			].concat(collection.successors.map(function (successor) {
+			].concat(collection.successors.map(function (successor, i) {
 				return (
-					<div key={successor.collection.collection_id * 3 + 1} className="collection_successors">
+					<div key={successor.collection.collection_id * 3 + 1} className="collection-successors">
 						<div className="successor">
-							{successor.note}
-							<button onClick={function () {
+							{successor.note}&nbsp;
+							<a onClick={function () {
 								this.props.onUnlinkCollection(collection_id, successor.collection.collection_id);
-							}.bind(this)}>Remove link</button>
+							}.bind(this)}>Remove link</a>
 						</div>
-						{collection_recurse(successor.collection)}
+						{collection_recurse(successor.collection, i, true)}
 					</div>
 				);
 			}.bind(this)))}</div>;
@@ -129,7 +132,7 @@ var ManagerCollectionList = React.createClass({
 		;
 
 		return (
-			<div className="manager_lists">
+			<div className="manager-lists">
 				<h1 id="manager-collections">Contacts</h1>
 				<div>{collection_html}</div>
 			</div>

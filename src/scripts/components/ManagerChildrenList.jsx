@@ -8,16 +8,7 @@ var React = require('react/addons');
 
 var ManagerChildrenList = React.createClass({
 	componentDidUpdate : function () {
-		var form = this.refs.bulk_import.getDOMNode();
-		$(form).ajaxForm(function (data) {
-			this.props.onDidBulkImport(data);
-			setTimeout(function () {
-				$(form).find("input[type=submit]").removeAttr("disabled");
-			}, 1000);
-		}.bind(this));
-		$(form).on("submit", function () {
-			$(form).find("input[type=submit]").attr("disabled", "disabled");
-		});
+		
 	},
 	componentDidMount : function () {
 		this.componentDidUpdate();
@@ -56,12 +47,6 @@ var ManagerChildrenList = React.createClass({
 					<a className="button-small soft" onClick={this.props.onShowOrphans}>View hidden categories</a>
 				</p>
 				<ul className="checklist no-check">{children_list}</ul>
-				<form encType="multipart/form-data" ref="bulk_import" action={this.props.domain + "area/" + this.props.area_id + "/upload"} method="post">
-					<fieldset>
-						<input type="file" name="datafile" />
-						<input type="submit" value="Bulk import" />
-					</fieldset>
-				</form>
 			</div>
 		);
 	}
